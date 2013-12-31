@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:s="library://ns.adobe.com/flex/spark" xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:d="http://ns.adobe.com/fxg/2008/dt">
+	<fx:Metadata>[HostComponent("spark.components.Button")]</fx:Metadata>
+	<s:states>
+		<s:State name="up"/>
+		<s:State name="over"/>
+		<s:State name="down"/>
+		<s:State name="disabled"/>
+	</s:states>
+	<s:BitmapImage smooth="true" source="@Embed('/assets/images/rana-v2/Forma 1.png')" d:userLabel="Forma 1" x="0" y="0" visible.disabled="false" id="bitmapimage4" visible.up="false">
+		<s:filters>
+			<s:DropShadowFilter includeIn="down" blurX="19" blurY="19" distance="4.0" hideObject="false" inner="true" color="0x000000" strength="1" alpha="0.49" quality="2" knockout="false" angle="45.0"/>
+		</s:filters>
+	</s:BitmapImage>
+	<s:BitmapImage smooth="true" source="@Embed('/assets/images/rana-v2/400 Puntos.png')" d:userLabel="400 Puntos" x="48" y="45" id="bitmapimage2" visible.disabled="false" y.down="49" visible.up="false"/>
+	<s:BitmapImage smooth="true" source="@Embed('/assets/images/rana-v2/btn off.png')" d:userLabel="btn off" x="0" y="0" visible.over="false" id="bitmapimage1" alpha.disabled="0.3" visible.down="false"/>
+	<s:BitmapImage smooth="true" source="@Embed('/assets/images/rana-v2/400 Puntos 0ff.png')" d:userLabel="400 Puntos 0ff" x="48" y="45" visible.over="false" id="bitmapimage3" alpha.disabled="0.3" visible.down="false"/>
+	<s:transitions>
+		<s:Transition fromState="disabled" toState="up" autoReverse="true">
+			<s:Parallel>
+				<s:Parallel target="{bitmapimage1}">
+					<s:Fade duration="0"/>
+				</s:Parallel>
+				<s:Parallel target="{bitmapimage3}">
+					<s:Fade duration="0"/>
+				</s:Parallel>
+			</s:Parallel>
+		</s:Transition>
+	</s:transitions>
+</s:Skin>

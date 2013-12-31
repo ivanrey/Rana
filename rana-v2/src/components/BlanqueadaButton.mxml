@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:s="library://ns.adobe.com/flex/spark" xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:d="http://ns.adobe.com/fxg/2008/dt">
+	<fx:Metadata>[HostComponent("spark.components.Button")]</fx:Metadata>
+	<s:states>
+		<s:State name="up"/>
+		<s:State name="over"/>
+		<s:State name="down"/>
+		<s:State name="disabled"/>
+	</s:states>
+	<s:BitmapImage alpha="0.2" smooth="true" source="@Embed('/assets/images/rana-v2/Blanqueada off.png')" d:userLabel="Blanqueada off" x="0" y="0" visible.up="false" id="bitmapimage1" visible.disabled="false"/>
+	<s:BitmapImage smooth="true" source="@Embed('/assets/images/rana-v2/Blanqueada.png')" d:userLabel="Blanqueada" x="0" y="0" visible.over="false" visible.down="false" visible.disabled="false"/>
+	<s:transitions>
+		<s:Transition fromState="disabled" toState="up" autoReverse="true">
+			<s:Parallel>
+				<s:Parallel target="{bitmapimage1}">
+					<s:Fade duration="0"/>
+				</s:Parallel>
+			</s:Parallel>
+		</s:Transition>
+	</s:transitions>
+</s:Skin>

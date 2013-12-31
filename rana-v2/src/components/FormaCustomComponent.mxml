@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:s="library://ns.adobe.com/flex/spark" xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:d="http://ns.adobe.com/fxg/2008/dt" addedToStage="cambiar()">
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.SWFLoader;
+			private var timer:Timer;
+			
+			[Bindable]
+			public var valor:String;
+			
+			[Bindable]
+			public var amarilla:Boolean = false;
+			
+			public function rodarMoneda():void{
+				rotarEnY.play();
+			}
+			
+			public function cambiar():void{
+				if(amarilla){
+					richtext1.setStyle('color','#b50400');
+					bitmapimage1.visible = false;
+				}
+			}
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<s:Rotate3D id="rotarEnY"
+					target="{this}"
+					angleYFrom="0"
+					angleYTo="720"
+					duration="2000"
+					autoCenterTransform="true" >
+			
+		</s:Rotate3D>
+	</fx:Declarations>
+	<s:BitmapImage height="157" id="bitmapimage2" smooth="true" source="@Embed('/assets/images/rana-v2/Forma 2 copia.png')" d:userLabel="Forma 2" width="157" x="0">
+	</s:BitmapImage>
+	<s:BitmapImage height="157" id="bitmapimage1" smooth="true" source="@Embed('/assets/images/rana-v2/Forma 2 copia 2.png')" d:userLabel="Forma 2" width="157" x="0">
+	</s:BitmapImage>
+	<s:RichText color="#88b55c" fontFamily="Counter-Strike" width="135" text="{valor}" fontSize="63" fontWeight="bold" id="richtext1" kerning="off" lineHeight="257.6%" textAlign="center" d:userLabel="10" whiteSpaceCollapse="preserve" x="10" y="68">	
+	</s:RichText>
+	
+</s:Group>

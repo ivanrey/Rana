@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:s="library://ns.adobe.com/flex/spark" xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:d="http://ns.adobe.com/fxg/2008/dt">
+	<fx:Metadata>[HostComponent("spark.components.Button")]</fx:Metadata>
+	<s:states>
+		<s:State name="up"/>
+		<s:State name="over"/>
+		<s:State name="down"/>
+		<s:State name="disabled"/>
+	</s:states>
+	<s:BitmapImage alpha="0.2" smooth="true" source="@Embed('/assets/images/rana-v2/desactivado1.png')" d:userLabel="desactivado" x="0" y="0"/>
+	<s:BitmapImage smooth="true" source="@Embed('/assets/images/rana-v2/activado1.png')" d:userLabel="activado" x="0" y="0" visible.disabled="false"/>
+	<s:RichText color="#88b55c" fontFamily="Counter-Strike" fontSize="37.984" fontWeight="bold" kerning="off" lineHeight="257.6%" textAlign="center" d:userLabel="20" whiteSpaceCollapse="preserve" width="80" x="9" y="41" id="labelDisplay" visible.disabled="false">
+	</s:RichText>
+</s:Skin>

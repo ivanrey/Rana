@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:s="library://ns.adobe.com/flex/spark" xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:d="http://ns.adobe.com/fxg/2008/dt">
+	<fx:Metadata>[HostComponent("spark.components.Button")]</fx:Metadata>
+	<s:states>
+		<s:State name="up"/>
+		<s:State name="over"/>
+		<s:State name="down"/>
+		<s:State name="disabled"/>
+	</s:states>
+	<s:BitmapImage smooth="true" source="@Embed('/assets/images/rana-v2/Forma 1.png')" d:userLabel="Forma 1 copia 3" x="0" y="0" id="bitmapimage1" visible.disabled="false" visible.up="false">
+		<s:filters>
+			<s:DropShadowFilter includeIn="down" blurX="20" blurY="20" distance="4.0" hideObject="false" inner="true" color="0x000000" strength="1" alpha="1" quality="2" knockout="false" angle="45.0"/>
+		</s:filters>
+	</s:BitmapImage>
+	<s:BitmapImage smooth="true" source="@Embed('/assets/images/rana-v2/800 Puntos copia.png')" d:userLabel="800 Puntos copia" x="47" y="48" y.down="52" id="bitmapimage4" visible.disabled="false" visible.up="false">
+		<s:filters>
+			<s:DropShadowFilter includeIn="down" blurX="4.0" blurY="4.0" distance="4.0" hideObject="false" inner="true" color="0x000000" strength="1" alpha="0.5" quality="2" knockout="false" angle="45.0"/>
+		</s:filters>
+	</s:BitmapImage>
+	<s:BitmapImage smooth="true" source="@Embed('/assets/images/rana-v2/Forma 1 copia.png')" d:userLabel="Forma 1 copia" x="0" y="0" visible.over="false" id="bitmapimage2" visible.down="false" alpha.disabled="0.3"/>
+	<s:BitmapImage smooth="true" source="@Embed('/assets/images/rana-v2/800 Puntos.png')" d:userLabel="800 Puntos" x="47" y="48" visible.over="false" id="bitmapimage3" visible.down="false" alpha.disabled="0.3"/>
+	<s:transitions>
+		<s:Transition fromState="disabled" toState="up" autoReverse="true">
+			<s:Parallel>
+				<s:Parallel target="{bitmapimage2}">
+					<s:Fade duration="0"/>
+				</s:Parallel>
+				<s:Parallel target="{bitmapimage3}">
+					<s:Fade duration="0"/>
+				</s:Parallel>
+			</s:Parallel>
+		</s:Transition>
+	</s:transitions>
+</s:Skin>
