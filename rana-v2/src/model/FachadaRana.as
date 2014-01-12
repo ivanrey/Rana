@@ -1,7 +1,7 @@
 package model {
 	import flash.events.EventDispatcher;
-	
-	import mx.core.mx_internal;
+	import flash.media.Sound;
+	import flash.net.URLRequest;
 	
 	import util.RanaException;
 
@@ -27,9 +27,18 @@ package model {
 		 * @return 	El numero de jugadores posibles
 		 */
 		public function agregarCredito():int {
-			this.credito+=200;
+			this.credito++;
+			
+			this.sonar("moneda");
 			return this.getCantidadJugadoresCredito();
 		}
+		
+		public function sonar(sonido:String):void{
+			var sonidoMoneda:Sound = new Sound();
+			sonidoMoneda.load(new URLRequest("/assets/sonidos/"+sonido+".mp3"));
+			sonidoMoneda.play();
+		}
+		
 		public function consultarCredito():int {
 			return this.credito;
 		}
@@ -40,11 +49,11 @@ package model {
 			return this.conf.getMaxBlanqueadas();
 		}
 		public function getCantidadJugadoresCredito():int{
-			var cantidad:int = this.credito/200;
-			return this.puntajeMaximo == 400 ? cantidad : cantidad/2;
+			return this.credito; // por ahora un credito por jugador sin importar el puntaje
 		}
 		public function setTipoJuego(tipo:int):void{
-			if((tipo == Configuracion.cuatroC) || tipo == Configuracion.ochoC)
+			if((tipo == Configuracion.cuatroC) || tipo == Configuracion.ochoC || 
+				tipo == Configuracion.milDoscientos || tipo == Configuracion.milOchocientos || tipo == Configuracion.milSeiscientos || tipo == Configuracion.dosMil)
 				this.puntajeMaximo = tipo;
 			else
 				throw new RanaException('El tipo de juego ingresado no ha sido definido');
@@ -61,6 +70,8 @@ package model {
 			// Descuento el credito usado
 			var valor:int = this.puntajeMaximo == 400 ? 200 : 400;
 			this.credito = this.credito - (numJugadores*valor);
+			
+			this.sonar("inicio");
 		}
 		public function sumarPuntos(orificio:int):void {
 			this.juego.registrarLanzamiento(orificio);
@@ -111,12 +122,33 @@ package model {
 			this.juego.addEventListener(RanaEvento.RANA_BLANQUEADO,fireEvent);
 			this.juego.addEventListener(RanaEvento.RANA_JUGADOR_DESACTIVADO,fireEvent);
 			this.juego.addEventListener(RanaEvento.RANA_TERMINAR_JUEGO,fireEvent);
+			
 		}
 		
 		private function fireEvent(event:RanaEvento):void{
 			if(event.type == RanaEvento.RANA_TERMINAR_JUEGO)
 				this.puntajeMaximo = -1;
 			dispatchEvent(new RanaEvento(event.type,event.params));
+			
+			switch(event.type){
+				case RanaEvento.RANA_BLANQUEADO:
+					this.sonar("blanqueado");
+					break;
+				case RanaEvento.RANA_ARGOLLA_INSERTADA:
+					this.sonar("lanzamiento");
+					break;
+				case RanaEvento.RANA_TURNO_CAMBIADO:
+					this.sonar("cambioturno");
+					break;
+				case RanaEvento.RANA_JUGADOR_DESACTIVADO:
+					this.sonar("jugadoreliminado");
+					break;
+				case RanaEvento.RANA_TERMINAR_JUEGO:
+					this.sonar("blanqueado");
+					break;
+						
+			}
+				
 		}
 	}
 }

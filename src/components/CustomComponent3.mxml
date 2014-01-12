@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:s="library://ns.adobe.com/flex/spark" xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:d="http://ns.adobe.com/fxg/2008/dt">
+	<s:states>
+		<s:State name="P400"/>
+		<s:State name="P800"/>
+	</s:states>
+	<s:BitmapImage id="bitmapimage1" smooth="true" source="@Embed('/assets/images/rana-v2/400 puntos1.png')" d:userLabel="400 puntos" x="0" y="0" visible.P800="false"/>
+	<s:BitmapImage smooth="true" source="@Embed('/assets/images/rana-v2/800 puntos1.png')" d:userLabel="800 puntos" x="0" y="0" visible.P400="false"/>
+</s:Group>

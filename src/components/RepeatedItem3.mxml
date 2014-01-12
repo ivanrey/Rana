@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:s="library://ns.adobe.com/flex/spark" xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:components="components.*" autoDrawBackground="false" xmlns:d="http://ns.adobe.com/fxg/2008/dt">
+	<s:states>
+		<s:State name="normal"/>
+		<s:State name="hovered"/>
+		<s:State name="selected"/>
+	</s:states>
+	<components:ranaonCustomComponent x="0" y="0">
+	</components:ranaonCustomComponent>
+	<s:Rect d:userLabel="Item Highlight Rectangle" width="20" height="16" alpha.normal="0" alpha.hovered="0.3" alpha.selected="0.5">
+		<s:fill>
+			<s:SolidColor color="0xCED7EE"/>
+		</s:fill>
+	</s:Rect>
+</s:ItemRenderer>

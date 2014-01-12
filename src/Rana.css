@@ -1,0 +1,43 @@
+@namespace s "library://ns.adobe.com/flex/spark";
+
+@font-face {
+	src:url("assets/fuentes/cs_regular.ttf");
+	fontFamily: Counter-Strike;
+	fontWeight: bold;
+	fontStyle: normal;
+	embedAsCFF:true;
+	advancedAntiAliasing: true;
+}
+
+@font-face {
+	src:url("assets/fuentes/Counter-Strike.ttf");
+	fontFamily: Counter-Strike;
+	advancedAntiAliasing: true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

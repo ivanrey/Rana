@@ -14,6 +14,12 @@ package  model {
 		
 		public static var cuatroC:int = 400;
 		public static var ochoC:int = 800;
+		public static var milDoscientos:int = 1200;
+		public static var milSeiscientos:int = 1600;
+		public static var milOchocientos:int = 1800;
+		public static var dosMil:int = 2000;
+		
+		
 		
 		private var xmlFile:XML;
 		public var maxBlanqueadas:int;

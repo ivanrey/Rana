@@ -9,10 +9,30 @@
 	advancedAntiAliasing: true;
 }
 
-@font-face {
-	src:url("assets/fuentes/Counter-Strike.ttf");
+
+.CounterBorde
+{
+	backgroundAlpha: 0.0;
+	backgroundColor: #D33434;
+	color: #070707;
 	fontFamily: Counter-Strike;
+	fontSize: 120;
+	fontWeight: bold;
+	textAlign: center;
+	themeColor: #E1DF24;
 	advancedAntiAliasing: true;
+	
+	
+}
+s|Button
+{
+	font-family: Counter-Strike;
+	font-size: 50;
+	font-weight: bold;
+	
+}
+global
+{
 }
 
 

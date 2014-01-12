@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:s="library://ns.adobe.com/flex/spark" xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:d="http://ns.adobe.com/fxg/2008/dt">
+	<s:states>
+		<s:State name="State1"/>
+		<s:State name="State2"/>
+		<s:State name="State3"/>
+	</s:states>
+	<s:BitmapImage height.State2="73" id="bitmapimage5" smooth="true" source="@Embed('/assets/images/rana-v2/comenzar.png')" d:userLabel="comenzar" width.State2="800" x.State2="0" y="0" y.State2="5" x.State1="18" x.State3="18"/>
+	<s:transitions>
+		<s:Transition fromState="State1" toState="State2" autoReverse="true">
+			<s:Parallel>
+				<s:Parallel target="{bitmapimage5}">
+					<s:Move duration="500" autoCenterTransform="true" startDelay="0"/>
+					<s:Resize duration="500" startDelay="0"/>
+				</s:Parallel>
+			</s:Parallel>
+		</s:Transition>
+		<s:Transition fromState="State2" toState="State3" autoReverse="true">
+			<s:Parallel>
+				<s:Parallel target="{bitmapimage5}">
+					<s:Move duration="500" autoCenterTransform="true" startDelay="0"/>
+					<s:Resize duration="500" startDelay="0"/>
+				</s:Parallel>
+			</s:Parallel>
+		</s:Transition>
+		<s:Transition fromState="State2" toState="State1" autoReverse="true">
+			<s:Parallel>
+				<s:Parallel target="{bitmapimage5}">
+					<s:Move duration="0" autoCenterTransform="true"/>
+					<s:Resize duration="0"/>
+				</s:Parallel>
+			</s:Parallel>
+		</s:Transition>
+	</s:transitions>
+</s:Group>

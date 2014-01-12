@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:s="library://ns.adobe.com/flex/spark" xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:d="http://ns.adobe.com/fxg/2008/dt">
+	<fx:Metadata>[HostComponent("spark.components.Button")]</fx:Metadata>
+	<s:states>
+		<s:State name="up"/>
+		<s:State name="over"/>
+		<s:State name="down"/>
+		<s:State name="disabled"/>
+	</s:states>
+	<s:BitmapImage alpha.disabled="0" id="bitmapimage1" smooth="true" source="@Embed('/assets/images/rana-v2/Capa 4.png')" d:userLabel="Capa 4" x="0" y="0"/>
+	<s:BitmapImage alpha.up="0" alpha.disabled="0.8" id="bitmapimagedes" smooth="true" source="@Embed('/assets/images/rana-v2/desactivado.png')" d:userLabel="Capa 4" x="0" y="0"/>
+	<s:RichText alpha="1" color="#FFFFFF" fontFamily="Counter-Strike" fontSize="30" fontWeight="bold" id="labelDisplay" includeIn="up" kerning="off" lineHeight="652.7%" tabStops="S0 S50 S100 S150" textAlign="right" d:userLabel="jugador 1" whiteSpaceCollapse="preserve" y="277"/>
+	<s:RichText alpha="1" color="#FFFFFF" fontFamily="Counter-Strike" fontSize="30" fontWeight="bold" id="labelDisplay1" includeIn="over" kerning="off" lineHeight="652.7%" tabStops="S0 S50 S100 S150" text="jugador" textAlign="right" d:userLabel="jugador 1" whiteSpaceCollapse="preserve" x="3" y="277"/>
+	<s:RichText alpha="1" color="#FFFFFF" fontFamily="Counter-Strike" fontSize="30" fontWeight="bold" id="labelDisplay0" includeIn="down" kerning="off" lineHeight="652.7%" tabStops="S0 S50 S100 S150" text="jugador" textAlign="right" d:userLabel="jugador 1" whiteSpaceCollapse="preserve" x="3" y="277"/>
+	<s:RichText alpha="0.1" color="#FFFFFF" fontFamily="Counter-Strike" fontSize="30" fontWeight="bold" id="labelDisplay6" includeIn="disabled" kerning="off" lineHeight="652.7%" tabStops="S0 S50 S100" textAlign="right" d:userLabel="jugador 1" whiteSpaceCollapse="preserve" x="22" y="277" text="jugador"/>
+	<s:transitions>
+		<s:Transition fromState="disabled" toState="up" autoReverse="true">
+			<s:Parallel>
+				<s:Parallel target="{bitmapimage1}">
+					<s:Fade duration="0"/>
+				</s:Parallel>
+				<s:Parallel target="{labelDisplay}">
+					<s:Fade duration="0"/>
+				</s:Parallel>
+				<s:Parallel target="{labelDisplay6}">
+					<s:Fade duration="0"/>
+				</s:Parallel>
+			</s:Parallel>
+		</s:Transition>
+		<s:Transition fromState="up" toState="over" autoReverse="true">
+			<s:Parallel>
+				<s:Parallel target="{labelDisplay}">
+					<s:Fade duration="0"/>
+				</s:Parallel>
+				<s:Parallel target="{labelDisplay1}">
+					<s:Fade duration="0"/>
+				</s:Parallel>
+			</s:Parallel>
+		</s:Transition>
+	</s:transitions>
+</s:Skin>
