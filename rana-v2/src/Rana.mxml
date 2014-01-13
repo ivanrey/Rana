@@ -388,19 +388,20 @@
 		}
 		
 		public function cambiarEstado(event:TimerEvent):void{
-			return;	
+				
 			var probabilidad:int = Math.round(Math.random()*600);
-				if(probabilidad == 1){
-					//1 de cada 600 segundos hay probabilidad que se muestre el video. Valor esperado 1 vez cada 10 minutos
-					this.currentState = "Video"
-					this.timerLoop.stop();
-					
-	
-				}else if(probabilidad % 10 == 0){
-					this.currentState = this.currentState == "Comenzar" ? "Puntajes" : "Comenzar"; 
-					this.timerLoop.stop();
-					
-				}
+			trace(probabilidad);
+			if(probabilidad == 1){
+				//1 de cada 600 segundos hay probabilidad que se muestre el video. Valor esperado 1 vez cada 10 minutos
+				this.currentState = "Video"
+				this.timerLoop.stop();
+				
+
+			}else if(probabilidad % 10 == 0){
+				this.currentState = this.currentState == "Comenzar" ? "Puntajes" : "Comenzar"; 
+				this.timerLoop.stop();
+				
+			}
 				
 		}
 		
@@ -454,15 +455,15 @@
 					visible.Principal="false"
 					visible.TipoDeJuego="false">
 		<s:BitmapImage id="bitmapimage3" d:userLabel="r-fondo"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					   includeIn="Puntajes"
 					   x="0" y="0" smooth="true" source="@Embed('/assets/images/rana-v2/Fondo.png')"/>
 		<s:BitmapImage id="bitmapimage4" d:userLabel="r-titulo"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					   includeIn="Puntajes"
 					   x="369" y="78" smooth="true"
 					   source="@Embed('/assets/images/rana-v2/RANKING.png')"
 					   x.Puntajes="366"/>
 		<s:List id="lst_records" d:userLabel="r-datalist"
-				includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+				includeIn="Puntajes"
 				x="369" y="196" skinClass="components.DataList2"
 				x.Puntajes="352" y.Puntajes="196" enabled.Puntajes="true" textAlign.Puntajes="left">
 			<s:ArrayCollection>
