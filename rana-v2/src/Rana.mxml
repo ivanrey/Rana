@@ -46,7 +46,7 @@
 			this.arrayJugadoresGraf[5] = this.button5;
 			this.stage.addEventListener(KeyboardEvent.KEY_DOWN,keyboard);
 			this.stage.addEventListener(MouseEvent.CLICK,click);
-			this.stage.displayState = StageDisplayState.NORMAL;
+			this.stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
 			
 			// Guardamos las monedas posibles
 			this.lanzamientos[0] = this.btn_lanz1;
@@ -382,15 +382,16 @@
 		}
 		
 		public function temporizarRecords():void{
-			this.timerLoop = new Timer(1000,0);
-			this.timerLoop.addEventListener(TimerEvent.TIMER,cambiarEstado);
+			if(!this.timerLoop){
+				this.timerLoop = new Timer(1000,0);
+				this.timerLoop.addEventListener(TimerEvent.TIMER,cambiarEstado);
+			}
 			this.timerLoop.start();
 		}
 		
 		public function cambiarEstado(event:TimerEvent):void{
 				
 			var probabilidad:int = Math.round(Math.random()*600);
-			trace(probabilidad);
 			if(probabilidad == 1){
 				//1 de cada 600 segundos hay probabilidad que se muestre el video. Valor esperado 1 vez cada 10 minutos
 				this.currentState = "Video"
