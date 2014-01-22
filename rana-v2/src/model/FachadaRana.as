@@ -51,7 +51,8 @@ package model {
 		}
 		public function getCantidadJugadoresCredito():int{
 			return this.puntajeMaximo > 1200 ? this.credito/2: this.credito; // por ahora un credito por jugador sin importar el puntaje
-		}0
+		}
+		
 		public function setTipoJuego(tipo:int):void{
 			if((tipo == Configuracion.cuatroC) || tipo == Configuracion.ochoC || 
 				tipo == Configuracion.milDoscientos || tipo == Configuracion.milOchocientos || tipo == Configuracion.milSeiscientos || tipo == Configuracion.dosMil)
