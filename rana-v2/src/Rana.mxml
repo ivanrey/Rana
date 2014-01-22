@@ -55,6 +55,18 @@
 			this.lanzamientos[3] = this.btn_lanz4;
 			this.lanzamientos[4] = this.btn_lanz5;
 			this.lanzamientos[5] = this.btn_lanz6;
+			this.lanzamientos[6] = this.btn_lanz7;
+			this.lanzamientos[7] = this.btn_lanz8;
+			this.lanzamientos[8] = this.btn_lanz9;
+			this.lanzamientos[9] = this.btn_lanz10;
+			this.lanzamientos[10] = this.btn_lanz11;
+			this.lanzamientos[11] = this.btn_lanz12;
+			this.lanzamientos[12] = this.btn_lanz13;
+			this.lanzamientos[13] = this.btn_lanz14;
+			this.lanzamientos[14] = this.btn_lanz15;
+			this.lanzamientos[15] = this.btn_lanz16;
+			this.lanzamientos[16] = this.btn_lanz17;
+			this.lanzamientos[17] = this.btn_lanz18;
 			
 			// Guardamos las monedas que representan los valores de los orificios
 			this.orificios[1] = bmp_orificio1;
@@ -90,6 +102,8 @@
 			this.fachada.addEventListener(RanaEvento.RANA_BLANQUEADO,blanquearJugador);
 			this.fachada.addEventListener(RanaEvento.RANA_JUGADOR_DESACTIVADO,desactivarJugador);
 			this.fachada.addEventListener(RanaEvento.RANA_TERMINAR_JUEGO,terminarJuego);
+			
+			
 		}
 		
 		public function registrarArgolla(event:RanaEvento):void{
@@ -185,6 +199,7 @@
 			for(var i:int=0; i<this.jugadores.length; i++){
 				this.jugadores[i].visible = this.jugadores[i].inicializado;
 			}
+			
 		}
 		
 		public function cambiarPuntaje(event:RanaEvento):void{
@@ -193,8 +208,10 @@
 		}
 		
 		public function limpiarMonedas():void{
-			for each(var button:Button in this.lanzamientos)
-				button.enabled = false;
+			for(var i:int = 0; i< this.lanzamientos.length; i++){
+				this.lanzamientos[i].enabled = false;
+				this.lanzamientos[i].visible = (i < this.fachada.getMaxLanzamientos());
+			}
 		}
 		
 		public function iniciarNuevoJuego():void{
@@ -210,7 +227,7 @@
 			}
 			this.limpiarTurnoPuntaje();
 			this.lst_puntajes_turnos.dataProvider = new ArrayCollection();
-			
+			this.lbl_tipo_juego_princ.text = this.fachada.getPuntajeMaximo() + ' Puntos';
 			
 			this.limpiarMonedas()
 			this.jugadores[0].activarEnTurno();
@@ -247,7 +264,7 @@
 				var jugadores:int = this.fachada.agregarCredito();
 				for(var i:int=0;i<jugadores && i<6;i++)
 					this.arrayJugadoresGraf[i].enabled = true;
-				this.lbl_texto_credito.text = '$'+this.fachada.consultarCredito();
+				this.lbl_texto_credito.text = this.fachada.consultarCredito() +(this.fachada.consultarCredito()==1?' Crédito':' Créditos');
 			}
 		}
 		
@@ -279,10 +296,8 @@
 					
 				}else if(key == Keyboard.ENTER){
 					if(this.fachada.getPuntajeMaximo() != -1){
-						this.currentState = 'Jugadores';
-						this.lbl_texto_credito.text = this.fachada.consultarCredito()+' Créditos';
-						for(var i:int=0;i<this.arrayJugadoresGraf.length-1;i++)
-							this.arrayJugadoresGraf[i].enabled = false;
+						this.currentState = 'Grupos';
+						this.configuracionActiva = -1;
 					}
 				}
 				
@@ -297,6 +312,45 @@
 					botones[this.configuracionActiva].skin.setCurrentState('down');
 					
 					this.fachada.setTipoJuego(configs[this.configuracionActiva]);
+					
+					
+				}
+			}
+			
+			if(estado == 'Grupos'){
+				var botones2:Array = [this.btnIndividual, this.btnEquipo2, this.btnEquipo3];
+				var configs2:Array = [Configuracion.individual, Configuracion.equiposDeDos, Configuracion.equiposDeTres];
+				var cambio2:int = 0;
+				
+				if(key == Keyboard.DOWN){
+					cambio2 = 1;
+					
+				}else if(key == Keyboard.UP){
+					cambio2 = -1;
+					
+					//Ajusto el caso inicial
+					if(this.configuracionActiva == -1) this.configuracionActiva = 0;
+					
+				}else if(key == Keyboard.ENTER){
+					if(this.fachada.getPuntajeMaximo() != -1){
+						this.currentState = 'Jugadores';
+						this.lbl_texto_credito.text = this.fachada.consultarCredito()+' Créditos';
+						for(var i:int = 0; i<this.arrayJugadoresGraf.length-1 ;i++)
+							this.arrayJugadoresGraf[i].enabled = false;
+					}
+				}
+				
+				if(cambio2 != 0 ){
+					
+					if(this.configuracionActiva!=-1){
+						botones2[this.configuracionActiva].skin.setCurrentState('up');
+					}
+					
+					this.configuracionActiva += cambio2 + botones2.length; // esta ultima suma es para evitar el modulo negativo
+					this.configuracionActiva %= botones2.length;
+					botones2[this.configuracionActiva].skin.setCurrentState('down');
+					
+					this.fachada.setParticipantePorJugador(configs2[this.configuracionActiva]);
 					
 					
 				}
@@ -414,6 +468,7 @@
 		<s:State enterState="temporizarRecords()" name="Comenzar"/>
 		<s:State enterState="actualizarRecords()" name="Puntajes"/>
 		<s:State name="TipoDeJuego"/>
+		<s:State name="Grupos"/>
 		<s:State name="Jugadores"/>
 		<s:State name="Principal"/>
 		<s:State name="Blanqueado"/>
@@ -455,18 +510,12 @@
 					visible.Jugadores="false"
 					visible.Principal="false"
 					visible.TipoDeJuego="false">
-		<s:BitmapImage id="bitmapimage3" d:userLabel="r-fondo"
-					   includeIn="Puntajes"
-					   x="0" y="0" smooth="true" source="@Embed('/assets/images/rana-v2/Fondo.png')"/>
-		<s:BitmapImage id="bitmapimage4" d:userLabel="r-titulo"
-					   includeIn="Puntajes"
-					   x="369" y="78" smooth="true"
-					   source="@Embed('/assets/images/rana-v2/RANKING.png')"
-					   x.Puntajes="366"/>
-		<s:List id="lst_records" d:userLabel="r-datalist"
-				includeIn="Puntajes"
-				x="369" y="196" skinClass="components.DataList2"
-				x.Puntajes="352" y.Puntajes="196" enabled.Puntajes="true" textAlign.Puntajes="left">
+		<s:BitmapImage id="bitmapimage3" d:userLabel="r-fondo" includeIn="Puntajes" x="0" y="0"
+					   smooth="true" source="@Embed('/assets/images/rana-v2/Fondo.png')"/>
+		<s:BitmapImage id="bitmapimage4" d:userLabel="r-titulo" includeIn="Puntajes" x="366" y="78"
+					   smooth="true" source="@Embed('/assets/images/rana-v2/RANKING.png')"/>
+		<s:List id="lst_records" d:userLabel="r-datalist" includeIn="Puntajes" x="352" y="196"
+				enabled="true" skinClass="components.DataList2" textAlign="left">
 			<s:ArrayCollection>
 				<fx:Object text1="APODOPERSONAJE" text2="79,3%"/>
 				<fx:Object text1="OTRO" text2="85.5%"/>
@@ -582,11 +631,10 @@
 			</s:filters>
 		</s:RichText>
 		<s:RichText d:userLabel="j-saldo"
-					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Principal,Puntajes,TipoDeJuego"
 					x="361" y="496" color="#ffffff" fontFamily="Counter-Strike" fontSize="69.81"
 					fontWeight="bold" kerning="off" lineHeight="652.7%" textAlign="right"
-					whiteSpaceCollapse="preserve"
-					x.Jugadores="309" y.Jugadores="496">
+					whiteSpaceCollapse="preserve">
 			<s:content><s:p><s:span>Credito</s:span></s:p></s:content>
 		</s:RichText>
 		<s:Button id="button5" d:userLabel="j-jugador6"
@@ -653,7 +701,8 @@
 		<s:BitmapImage d:userLabel="Forma 4 copia"
 					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
 					   x="298" y="30" smooth="true"
-					   source="@Embed('/assets/images/rana-v2/Forma 4 copia.png')">
+					   source="@Embed('/assets/images/rana-v2/Forma 4 copia.png')"
+					   x.Principal="300" y.Principal="26">
 			<s:mask>
 				<s:Group x="0" y="0">
 					<s:Path data="M 7.95 0 L 362.45 0 C 366.9 0 370.45 3.55 370.45 7.95 L 370.45 700.5 C 370.45 704.9 366.9 708.45 362.45 708.45 L 7.95 708.45 C 3.55 708.45 0 704.9 0 700.5 L 0 7.95 C 0 3.55 3.55 0 7.95 0"
@@ -669,7 +718,7 @@
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio10" includeIn="Principal" x="738"
+			<components:FormaCustomComponent id="bmp_orificio10" includeIn="Comenzar,Principal" x="738"
 											 y="105" valor="10">
 			</components:FormaCustomComponent>
 			<fx:DesignLayer d:userLabel="Layer 2"/>
@@ -678,7 +727,7 @@
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio12" includeIn="Principal" x="1060"
+			<components:FormaCustomComponent id="bmp_orificio12" includeIn="Comenzar,Principal" x="1060"
 											 y="105" valor="10">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
@@ -686,7 +735,7 @@
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio11" includeIn="Principal" x="899"
+			<components:FormaCustomComponent id="bmp_orificio11" includeIn="Comenzar,Principal" x="899"
 											 y="105" amarilla="true" valor="100">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
@@ -694,7 +743,7 @@
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio8" includeIn="Principal" x="899" y="267"
+			<components:FormaCustomComponent id="bmp_orificio8" includeIn="Comenzar,Principal" x="899" y="267"
 											 amarilla="true" valor="120">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
@@ -702,7 +751,7 @@
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio7" includeIn="Principal" x="738" y="267"
+			<components:FormaCustomComponent id="bmp_orificio7" includeIn="Comenzar,Principal" x="738" y="267"
 											 valor="15">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
@@ -710,7 +759,7 @@
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio9" includeIn="Principal" x="1060"
+			<components:FormaCustomComponent id="bmp_orificio9" includeIn="Comenzar,Principal" x="1060"
 											 y="267" valor="15">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
@@ -718,7 +767,7 @@
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio4" includeIn="Principal" x="738" y="432"
+			<components:FormaCustomComponent id="bmp_orificio4" includeIn="Comenzar,Principal" x="738" y="432"
 											 valor="20">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
@@ -726,7 +775,7 @@
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio6" includeIn="Principal" x="1060"
+			<components:FormaCustomComponent id="bmp_orificio6" includeIn="Comenzar,Principal" x="1060"
 											 y="432" valor="20">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
@@ -734,7 +783,7 @@
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio5" includeIn="Principal" x="899" y="432"
+			<components:FormaCustomComponent id="bmp_orificio5" includeIn="Comenzar,Principal" x="899" y="432"
 											 valor="40">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
@@ -742,7 +791,7 @@
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio1" includeIn="Principal" x="738" y="595"
+			<components:FormaCustomComponent id="bmp_orificio1" includeIn="Comenzar,Principal" x="738" y="595"
 											 valor="30">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
@@ -750,7 +799,7 @@
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio2" includeIn="Principal" x="899" y="595"
+			<components:FormaCustomComponent id="bmp_orificio2" includeIn="Comenzar,Principal" x="899" y="595"
 											 valor="30">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
@@ -758,13 +807,13 @@
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio3" includeIn="Principal" x="1060"
+			<components:FormaCustomComponent id="bmp_orificio3" includeIn="Comenzar,Principal" x="1060"
 											 y="595" valor="30">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer d:userLabel="Turno actual">
 			<s:List id="lst_puntajes_turnos" d:userLabel="ta-datalistturnos" includeIn="Principal"
-					x="319" y="472" skinClass="components.UltimosPuntajes">
+					visible="false" x="319" y="472" skinClass="components.UltimosPuntajes">
 				<s:ArrayCollection>
 					<fx:Object image1="@Embed('/assets/images/rana-v2/Forma 7.png')" text1="3"
 							   text2="tiro" text3="puntos" text4="900"/>
@@ -831,7 +880,8 @@
 						includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
 						x="339" y="92" color="#f69c00" fontFamily="Counter-Strike" fontSize="70.86"
 						fontWeight="bold" kerning="off" lineHeight="652.7%"
-						whiteSpaceCollapse="preserve">
+						whiteSpaceCollapse="preserve"
+						x.Principal="353" y.Principal="92">
 				<s:content><s:p><s:span>4</s:span></s:p></s:content>
 				<s:filters>
 					<s:DropShadowFilter includeIn="FinJuego,Principal,Blanqueado" alpha="0.5"
@@ -843,22 +893,51 @@
 			<s:Button id="btn_lanz1" d:userLabel="ta-puntoshueco1"
 					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
 					  x="318" y="149" label="120" enabled="true" skinClass="components.Button4"
-					  label.Principal="120"/>
+					  x.Principal="318" y.Principal="127" label.Principal="120"/>
 			<s:Button id="btn_lanz2" d:userLabel="ta-puntoshueco2"
 					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					  x="427" y="149" label="20" enabled="false" skinClass="components.Button4"/>
+					  x="427" y="149" label="20" enabled="false" skinClass="components.Button4"
+					  x.Principal="427" y.Principal="127"/>
 			<s:Button id="btn_lanz3" d:userLabel="ta-puntoshueco3"
 					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					  x="537" y="149" label="20" enabled="false" skinClass="components.Button4"/>
+					  x="537" y="149" label="20" enabled="false" skinClass="components.Button4"
+					  x.Principal="537" y.Principal="127"/>
+			<s:Button id="btn_lanz7" d:userLabel="ta-puntoshueco1" includeIn="Comenzar,Principal" x="318"
+					  y="325" label="120" enabled="true" skinClass="components.Button4"/>
+			<s:Button id="btn_lanz8" d:userLabel="ta-puntoshueco2" includeIn="Comenzar,Principal" x="427"
+					  y="325" label="20" enabled="false" skinClass="components.Button4"/>
+			<s:Button id="btn_lanz9" d:userLabel="ta-puntoshueco3" includeIn="Comenzar,Principal" x="537"
+					  y="325" label="20" enabled="false" skinClass="components.Button4"/>
+			<s:Button id="btn_lanz10" d:userLabel="ta-puntoshueco4" includeIn="Comenzar,Principal" x="318"
+					  y="424" label="20" enabled="false" skinClass="components.Button4"/>
+			<s:Button id="btn_lanz11" d:userLabel="ta-puntoshueco5" includeIn="Comenzar,Principal" x="427"
+					  y="424" label="30" enabled="false" skinClass="components.Button4"/>
+			<s:Button id="btn_lanz12" d:userLabel="ta-puntoshueco6" includeIn="Comenzar,Principal" x="537"
+					  y="424" label="20" enabled="false" skinClass="components.Button4"/>
+			<s:Button id="btn_lanz13" d:userLabel="ta-puntoshueco1" includeIn="Comenzar,Principal" x="318"
+					  y="524" label="20" enabled="true" skinClass="components.Button4"/>
+			<s:Button id="btn_lanz14" d:userLabel="ta-puntoshueco2" includeIn="Comenzar,Principal" x="427"
+					  y="524" label="20" enabled="false" skinClass="components.Button4"/>
+			<s:Button id="btn_lanz15" d:userLabel="ta-puntoshueco3" includeIn="Comenzar,Principal" x="537"
+					  y="524" label="20" enabled="false" skinClass="components.Button4"/>
+			<s:Button id="btn_lanz16" d:userLabel="ta-puntoshueco4" includeIn="Comenzar,Principal" x="318"
+					  y="623" label="20" enabled="false" skinClass="components.Button4"/>
+			<s:Button id="btn_lanz17" d:userLabel="ta-puntoshueco5" includeIn="Comenzar,Principal" x="427"
+					  y="623" label="30" enabled="false" skinClass="components.Button4"/>
+			<s:Button id="btn_lanz18" d:userLabel="ta-puntoshueco6" includeIn="Comenzar,Principal" x="537"
+					  y="623" label="20" enabled="false" skinClass="components.Button4"/>
 			<s:Button id="btn_lanz4" d:userLabel="ta-puntoshueco4"
 					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					  x="318" y="258" label="20" enabled="false" skinClass="components.Button4"/>
+					  x="318" y="258" label="20" enabled="false" skinClass="components.Button4"
+					  x.Principal="318" y.Principal="226"/>
 			<s:Button id="btn_lanz5" d:userLabel="ta-puntoshueco5"
 					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					  x="427" y="258" label="30" enabled="false" skinClass="components.Button4"/>
+					  x="427" y="258" label="30" enabled="false" skinClass="components.Button4"
+					  x.Principal="427" y.Principal="226"/>
 			<s:Button id="btn_lanz6" d:userLabel="ta-puntoshueco6"
 					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					  x="537" y="258" label="20" enabled="false" skinClass="components.Button4"/>
+					  x="537" y="258" label="20" enabled="false" skinClass="components.Button4"
+					  x.Principal="537" y.Principal="226"/>
 		</fx:DesignLayer>
 		<s:RichText d:userLabel="ta-tipodejuego"
 					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
@@ -867,7 +946,8 @@
 					textAlign="center" whiteSpaceCollapse="preserve"
 					x.Comenzar="734" y.Comenzar="40" fontSize.Comenzar="69.41"
 					tabStops.Comenzar="S0 S50 S100 S150 S200 S250 S300 S350 S400 S450"
-					x.Principal="738" width.Principal="480" color.Principal="#020202">
+					x.Principal="738" width.Principal="480" color.Principal="#020202"
+					text.Principal="Meta">
 		</s:RichText>
 		<s:RichText id="lbl_tipo_juego_princ" d:userLabel="ta-tipodejuego"
 					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
@@ -1235,6 +1315,14 @@
 							height="85" label="1800 Puntos"/>
 	<components:BotonPuntos id="btnDosmil" includeIn="TipoDeJuego" y="399" right="30" height="85"
 							label="2000 Puntos"/>
+	<s:Image includeIn="Grupos" left="0" right="0" top="0" bottom="0"
+			 source="@Embed('assets/images/rana-v2/grupos.png')"/>
+	<components:BotonPuntos id="btnIndividual" includeIn="Grupos" x="234" y="242" height="66"
+							label="Individual"/>
+	<components:BotonPuntos id="btnEquipo2" includeIn="Grupos" x="234" y="342" height="66"
+							label="Equipos de 2"/>
+	<components:BotonPuntos id="btnEquipo3" includeIn="Grupos" x="234" y="442" height="66"
+							label="Equipos de 3"/>
 		
 	<s:transitions>
 		<s:Transition autoReverse="true" fromState="TipoDeJuego" toState="Puntajes">

@@ -19,7 +19,9 @@ package  model {
 		public static var milOchocientos:int = 1800;
 		public static var dosMil:int = 2000;
 		
-		
+		public static var individual:int = 1;
+		public static var equiposDeDos:int = 2;
+		public static var equiposDeTres:int = 3;
 		
 		private var xmlFile:XML;
 		public var maxBlanqueadas:int;

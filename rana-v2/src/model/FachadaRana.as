@@ -13,6 +13,7 @@ package model {
 		private var conf:Configuracion;
 		private var recordsVar:Records;
 		private var juego:JuegoRana;
+		private var participantesPorJugador:int;
 		
 		public function FachadaRana():void{
 			this.conf = new Configuracion();
@@ -49,7 +50,7 @@ package model {
 			return this.conf.getMaxBlanqueadas();
 		}
 		public function getCantidadJugadoresCredito():int{
-			return this.credito; // por ahora un credito por jugador sin importar el puntaje
+			return this.puntajeMaximo > 1200 ? this.credito: this.credito/2; // por ahora un credito por jugador sin importar el puntaje
 		}
 		public function setTipoJuego(tipo:int):void{
 			if((tipo == Configuracion.cuatroC) || tipo == Configuracion.ochoC || 
@@ -64,15 +65,18 @@ package model {
 			this.juego = new JuegoRana(this.conf);
 			this.juego.setPuntajeMaximo(this.puntajeMaximo);
 			this.juego.setNumJugadores(numJugadores);
+			this.juego.setParticipantesPorJugador(this.participantesPorJugador);
 			this.juego.iniciarJuego();
+			
 			this.addListeners();
 			
 			// Descuento el credito usado
-			var valor:int = this.puntajeMaximo == 400 ? 200 : 400;
+			var valor:int = this.puntajeMaximo > 1200 ? 1 : 2;
 			this.credito = this.credito - (numJugadores*valor);
 			
 			this.sonar("inicio");
 		}
+		
 		public function sumarPuntos(orificio:int):void {
 			this.juego.registrarLanzamiento(orificio);
 		}
@@ -94,6 +98,14 @@ package model {
 		
 		public function getPuntajeMaximo():int{
 			return this.puntajeMaximo;
+		}
+		
+		public function getMaxLanzamientos():int{
+			return this.juego.getMaxLanzamientos();
+		}
+		
+		public function setParticipantePorJugador( participantes:int):void{
+			this.participantesPorJugador = participantes;
 		}
 		
 		public function analizarRecords():Array{

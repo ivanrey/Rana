@@ -12,6 +12,7 @@ package model {
 		private var puntajeTurno:int;
 		private var puntajesTurno:Array;
 		private var configuracion:Configuracion;
+		private var maxLanzamientos:int;
 		
 		public function JuegoRana(configuracion:Configuracion){
 			this.numJugadores = 0;
@@ -28,20 +29,29 @@ package model {
 				throw new RanaException("El numero de jugadores debe de ser mayor a cero");
 			this.numJugadores = valor;
 		}
+		
 		public function getNumJugadores():int {
 			return this.numJugadores;
 		}
+		
 		public function getTurno():int{
 			return this.turno;
 		}
+		
 		public function getPuntajeMaximo():int {
 			return this.puntajeMaximo;
 		}
+		
 		public function setPuntajeMaximo(valor:int):void {
 			if(valor < 1)
 				throw new RanaException("El puntaje maximo debe de ser mayor a cero");
 			this.puntajeMaximo = valor;
 		}
+		
+		public function setParticipantesPorJugador( participantes:int ):void{
+			this.maxLanzamientos = participantes * 6; //cada participante tiene 6 lanzamientos
+		}
+		
 		public function iniciarJuego():void {
 			if(this.numJugadores < 1)
 				throw new RanaException("El numero de jugadores debe de ser mayor a cero");
@@ -58,8 +68,8 @@ package model {
 
 		public function registrarLanzamiento(orificio:int):void {
 			
-			// Verificamos que no se hayan registrado mas de 6 lanzamientos
-			if(this.puntajesTurno.length >= 6)
+			// Verificamos que no se hayan registrado mas de maxLanzamientos lanzamientos
+			if(this.puntajesTurno.length >= this.maxLanzamientos)
 				return;
 			
 			var puntaje:int = configuracion.getPuntoEnOrificio(orificio);			
@@ -77,6 +87,10 @@ package model {
 		
 		public function getJugadorEnTurno():Jugador{
 			return this.jugadores[this.turno-1];
+		}
+		
+		public function getMaxLanzamientos():int{
+			return this.maxLanzamientos;
 		}
 		
 		/**
