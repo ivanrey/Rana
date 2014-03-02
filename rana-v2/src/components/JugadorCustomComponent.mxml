@@ -4,7 +4,8 @@
 		 xmlns:d="http://ns.adobe.com/fxg/2008/dt"
 		 xmlns:components="components.*"
 		 show="mostrarFunc(event)"
-		 height.activado="128">
+		 width.activado="322" height.activado="128"
+		 height.desactivado="128">
 	<fx:Script><![CDATA[
 		import flashx.textLayout.formats.Float;
 		
@@ -12,14 +13,33 @@
 		public var inicializado:Boolean = false;
 		public var puntajeMax:int;
 		
+		[Bindable]
+		private var tipoJugador:String = 'Jugador';
+		[Bindable]
+		private var letraJugador:String = '@'; //cuando juegan por equipos cada jugador tiene una letra
+		private var maxJugadores:int = 0;
 		
 		public function inicializarComponente(nomJugador:String,puntajeMaximo:int):void{
-			lbl_nom_jugador.text = 'Jugador '+nomJugador;
+			lbl_nom_jugador.text = this.tipoJugador+' '+nomJugador;
 			lst_blanqueados.dataProvider = new ArrayCollection();
 			comp_puntaje.asignarPuntaje(0,0);
 			this.inicializado = true;
 			this.puntajeMax = puntajeMaximo;
+			this.letraJugador = '@';
 		}
+		
+		/**
+		 * Se debe llamar antes de incicializar el componente
+		 */
+		public function jugarPorEquipos(maxJugadores:int):void{
+			this.tipoJugador = 'Equipo';
+			this.maxJugadores = maxJugadores;
+		}
+		
+		public function jugarIndividual():void{
+			this.tipoJugador = 'Jugador';
+		}
+		
 		
 		public function mostrarFunc(event:Event):void{
 			var obj:Object = event.target;
@@ -29,12 +49,11 @@
 		
 		public function activarEnTurno():void{
 			this.currentState = "activado";
-			//this.bitmapimage1.visible = true;
+			this.letraJugador = String.fromCharCode(65+((this.letraJugador.charCodeAt(0)-64)%maxJugadores));
 		}
 		
 		public function desactivarTurno():void{
-			this.currentState = "desactivado";
-			//this.bitmapimage1.visible = false;	
+			this.currentState = "desactivado";	
 		}
 		
 		public function cambiarPuntaje(puntaje:int):void{
@@ -53,10 +72,13 @@
 		<s:State name="desactivado"/>
 	</s:states>
 	<fx:DesignLayer id="designlayer6" d:userLabel="Jugador">
-		<s:BitmapImage id="bitmapimage1" smooth="true" source="@Embed('/assets/images/rana-v2/Forma 3 copia.png')" d:userLabel="Forma 3 copia" x="0" y="17" visible.desactivado="false">
+		<s:BitmapImage id="bitmapimage1" d:userLabel="Forma 3 copia" x="0" y="17" smooth="true"
+					   source="@Embed('/assets/images/rana-v2/Forma 3 copia.png')"
+					   visible.desactivado="false">
 			<s:mask>
 				<s:Group x="0" y="0">
-					<s:Path data="M 8.45 0 L 309.45 0 C 313.9 0 317.45 3.55 317.45 7.95 L 317.45 83.95 C 317.45 88.4 313.9 91.95 309.45 91.95 L 8.45 91.95 C 4.05 91.95 0.45 88.4 0.45 83.95 L 0.45 7.95 C 0.45 3.55 4.05 0 8.45 0" winding="evenOdd">
+					<s:Path data="M 8.45 0 L 309.45 0 C 313.9 0 317.45 3.55 317.45 7.95 L 317.45 83.95 C 317.45 88.4 313.9 91.95 309.45 91.95 L 8.45 91.95 C 4.05 91.95 0.45 88.4 0.45 83.95 L 0.45 7.95 C 0.45 3.55 4.05 0 8.45 0"
+							winding="evenOdd">
 						<s:fill>
 							<s:SolidColor color="#ff0000"/>
 						</s:fill>
@@ -64,11 +86,18 @@
 				</s:Group>
 			</s:mask>
 		</s:BitmapImage>
-		<s:BitmapImage smooth="true" source="@Embed('/assets/images/rana-v2/desactivado.png')" d:userLabel="desactivado" visible="false" x="13" y="8"/>
-		<s:BitmapImage smooth="true" source="@Embed('/assets/images/rana-v2/activado.png')" d:userLabel="activado" x="5" y="0"/>
-		<components:CustomComponent1 id="comp_puntaje" x="97" y="44" d:userLabel="ts-progressbar">
-		</components:CustomComponent1>
-		<s:List id="lst_blanqueados" skinClass="components.blanqueadas" d:userLabel="ta-jugadorblanqueadas" x.activado="98" x.desactivado="97" y.activado="85" y.desactivado="86">
+		<s:BitmapImage d:userLabel="desactivado" includeIn="desactivado" x="10" y="8" width="68"
+					   height="105" smooth="true"
+					   source="@Embed('/assets/images/rana-v2/desactivado.png')"/>
+		<s:BitmapImage d:userLabel="activado" includeIn="activado" x="5" y="0" smooth="true"
+					   source="@Embed('/assets/images/rana-v2/activado.png')"/>
+			
+		<components:ComponentePuntaje id="comp_puntaje" d:userLabel="ts-progressbar" x="97" y="44">
+		</components:ComponentePuntaje>
+		<s:List id="lst_blanqueados" d:userLabel="ta-jugadorblanqueadas"
+				skinClass="components.blanqueadas"
+				x.activado="98" y.activado="85"
+				x.desactivado="97" y.desactivado="86">
 			<s:ArrayCollection>
 				<fx:Object/>
 				<fx:Object/>
@@ -77,10 +106,18 @@
 				<fx:Object/>
 			</s:ArrayCollection>
 		</s:List>
-		<s:RichText color="#ffffff" fontFamily="Counter-Strike" fontSize="29.22" fontWeight="bold" id="lbl_nom_jugador" kerning="off" lineHeight="652.7%" textAlign="right" d:userLabel="ta-titjugador" whiteSpaceCollapse="preserve" x="99" y="25">
-			<s:content><s:p><s:span>jugador 1</s:span></s:p></s:content>
+		<s:RichText id="lbl_nom_jugador" d:userLabel="ta-titjugador" x="99" y="25" color="#ffffff"
+					fontFamily="Counter-Strike" fontSize="29.22" fontWeight="bold" kerning="off"
+					lineHeight="652.7%" textAlign="right" whiteSpaceCollapse="preserve">
+			<s:content><s:p><s:span>Equipo 1</s:span></s:p></s:content>
 		</s:RichText>
 	</fx:DesignLayer>
+	<s:RichText id="lbl_letra_jugador" visible="{tipoJugador == 'Equipo'}" d:userLabel="ta-titjugador" includeIn="activado" x="27" y="61"
+				width="45" height="57" color="#ffffff" fontFamily="Counter-Strike" fontSize="40"
+				fontWeight="bold" kerning="off" lineHeight="652.7%" text="{letraJugador}"
+				textAlign="center" verticalAlign="middle" whiteSpaceCollapse="preserve">
+		
+	</s:RichText>
 	<s:transitions>
 		<s:Transition autoReverse="true" fromState="activado" toState="desactivado">
 			<s:Parallel>

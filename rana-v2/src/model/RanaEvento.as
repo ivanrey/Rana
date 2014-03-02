@@ -13,8 +13,10 @@ package model{
 		public static const RANA_TURNO_CAMBIADO:String = "TurnoCambiado";
 		public static const RANA_PUNTAJE_CAMBIO:String = "CambioPuntajeJugador";
 		
-		public static const FIN_JUEGO_NORMAL:String = "FinJuegoGandor";
+		public static const FIN_JUEGO_NORMAL:String = "FinJuego";
 		public static const FIN_JUEGO_BLANQUEADO:String = "FinJuegoBlanqueados";
+		
+		public static const GANADOR:String = "Ganador";
 		
 		public var params:*;
 		

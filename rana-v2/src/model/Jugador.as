@@ -72,9 +72,14 @@ package model {
 		public function getCantidadLanzamientos():int{
 			return this.puntajes.length;
 		}
-		public function sumarPuntos(puntos:int):void{
-			this.puntaje+=puntos;
-			this.puntajes.push(puntos);
+		public function sumarPuntos(puntos:int, maximo:int):void{
+			if(!this.activo) return;
+			
+			var puntajeAnterior:int = this.puntaje;
+			this.puntaje = Math.min(maximo, this.puntaje + puntos);
+			this.puntajes.push(this.puntaje - puntajeAnterior);
+			if(this.puntaje == maximo)
+				this.desactivar(); //Este jugador ya gano
 		}
 		public function getPromedioLanzamientos():Number{
 			return this.puntaje/this.puntajes.length;

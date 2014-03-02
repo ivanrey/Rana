@@ -49,7 +49,7 @@ package model {
 		}
 		
 		public function setParticipantesPorJugador( participantes:int ):void{
-			this.maxLanzamientos = participantes * 6; //cada participante tiene 6 lanzamientos
+			this.maxLanzamientos = 6;//participantes * 6; //cada participante tiene 6 lanzamientos
 		}
 		
 		public function iniciarJuego():void {
@@ -68,21 +68,26 @@ package model {
 
 		public function registrarLanzamiento(orificio:int):void {
 			
+			var jugador:Jugador = this.getJugadorEnTurno();
 			// Verificamos que no se hayan registrado mas de maxLanzamientos lanzamientos
-			if(this.puntajesTurno.length >= this.maxLanzamientos)
+			if(this.puntajesTurno.length >= this.maxLanzamientos || !jugador.getEstado())
 				return;
 			
 			var puntaje:int = configuracion.getPuntoEnOrificio(orificio);			
-			var jugador:Jugador = this.getJugadorEnTurno();
-			this.puntajeTurno+=puntaje;
+			
+			this.puntajeTurno = Math.min(this.puntajeMaximo,this.puntajeTurno + puntaje);
+			
 			this.puntajesTurno.push(puntaje);
 			
-			// Verificamos que no se haya acabado el juego
-			if(jugador.getPuntajeActual() + this.puntajeTurno >= this.puntajeMaximo){
-				jugador.sumarPuntos(this.puntajeTurno);
-				this.finalizarJuego(RanaEvento.FIN_JUEGO_NORMAL);
-			}
 			dispatchEvent(new RanaEvento(RanaEvento.RANA_ARGOLLA_INSERTADA,new Array(puntaje,this.puntajeTurno,orificio)));
+			
+			// Verificamos si el jugador actual gano
+			if(jugador.getPuntajeActual() + this.puntajeTurno >= this.puntajeMaximo){
+				jugador.sumarPuntos(this.puntajeTurno,this.puntajeMaximo);
+				dispatchEvent(new RanaEvento(RanaEvento.GANADOR, new Array(puntaje, this.puntajeTurno, orificio, this.puntajeMaximo, jugador)));
+			}
+			
+			
 		}
 		
 		public function getJugadorEnTurno():Jugador{
@@ -126,7 +131,7 @@ package model {
 				}
 				this.puntajeTurno = -10;
 			}
-			jugador.sumarPuntos(this.puntajeTurno);
+			jugador.sumarPuntos(this.puntajeTurno, this.puntajeMaximo);
 			dispatchEvent(new RanaEvento(RanaEvento.RANA_PUNTAJE_CAMBIO, new Array(this.turno,jugador.getPuntajeActual())));
 			
 			// 	Calculamos el proximo turno (Hay que tener en cuenta los jugadores que ya no estan activos 
@@ -135,7 +140,7 @@ package model {
 			this.asignarProximoTurno(nuevoTurno);
 		}
 		/** 
-		 * Este metodo sera lanzado una vez uno de los jugadores alcanze o supere el puntaje maximo.
+		 * Este metodo sera lanzado una vez todos menos uno de los jugadores alcanze o supere el puntaje maximo.
 		 * Internamente se calculara si uno de los participantes obtuvo un nuevo record en la rana.
 		 */
 		public function finalizarJuego(tipo:String):void {			

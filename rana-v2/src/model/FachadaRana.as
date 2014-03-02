@@ -50,7 +50,8 @@ package model {
 			return this.conf.getMaxBlanqueadas();
 		}
 		public function getCantidadJugadoresCredito():int{
-			return this.puntajeMaximo > 1200 ? this.credito/2: this.credito; // por ahora un credito por jugador sin importar el puntaje
+			var monedasPorPersona:int = this.puntajeMaximo > 1200 ? this.credito/2: this.credito; // por ahora un credito por jugador sin importar el puntaje
+			return Math.floor(monedasPorPersona/this.participantesPorJugador);
 		}
 		
 		public function setTipoJuego(tipo:int):void{
@@ -109,6 +110,10 @@ package model {
 			this.participantesPorJugador = participantes;
 		}
 		
+		public function getParticipantesPorJugador():int{
+			return this.participantesPorJugador;
+		}
+		
 		public function analizarRecords():Array{
 			var puntajes:Array = this.juego.getPromediosJugadores();
 			var records:Array = new Array();
@@ -135,7 +140,7 @@ package model {
 			this.juego.addEventListener(RanaEvento.RANA_BLANQUEADO,fireEvent);
 			this.juego.addEventListener(RanaEvento.RANA_JUGADOR_DESACTIVADO,fireEvent);
 			this.juego.addEventListener(RanaEvento.RANA_TERMINAR_JUEGO,fireEvent);
-			
+			this.juego.addEventListener(RanaEvento.GANADOR,fireEvent);
 		}
 		
 		private function fireEvent(event:RanaEvento):void{
@@ -159,7 +164,8 @@ package model {
 				case RanaEvento.RANA_TERMINAR_JUEGO:
 					this.sonar("blanqueado");
 					break;
-						
+				case RanaEvento.GANADOR:
+					this.sonar("ganador");
 			}
 				
 		}

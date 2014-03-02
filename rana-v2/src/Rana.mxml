@@ -14,6 +14,7 @@
 		import model.Configuracion;
 		import model.FachadaRana;
 		import model.RanaEvento;
+		import util.Puntaje;
 		
 		import mx.controls.Alert;
 		import mx.controls.VideoDisplay;
@@ -46,7 +47,7 @@
 			this.arrayJugadoresGraf[5] = this.button5;
 			this.stage.addEventListener(KeyboardEvent.KEY_DOWN,keyboard);
 			this.stage.addEventListener(MouseEvent.CLICK,click);
-			this.stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+			this.stage.displayState = StageDisplayState.NORMAL;
 			
 			// Guardamos las monedas posibles
 			this.lanzamientos[0] = this.btn_lanz1;
@@ -101,7 +102,7 @@
 			this.fachada.addEventListener(RanaEvento.RANA_PUNTAJE_CAMBIO,cambiarPuntaje);
 			this.fachada.addEventListener(RanaEvento.RANA_BLANQUEADO,blanquearJugador);
 			this.fachada.addEventListener(RanaEvento.RANA_JUGADOR_DESACTIVADO,desactivarJugador);
-			this.fachada.addEventListener(RanaEvento.RANA_TERMINAR_JUEGO,terminarJuego);
+			this.fachada.addEventListener(RanaEvento.GANADOR,ganador);
 			
 			
 		}
@@ -137,15 +138,11 @@
 			timer.start();
 		}
 		
-		public function terminarJuego(event:RanaEvento):void{
-			if(event.params == RanaEvento.FIN_JUEGO_NORMAL){
+		public function ganador(event:RanaEvento):void{
+			if(event.type == RanaEvento.GANADOR){
 				this.currentState = "Ganaste";
 				this.lbl_nomJugador.text = "Jugador "+this.fachada.consultarTurno();
-				var timer:Timer = new Timer(1000,5);
-				timer.addEventListener(TimerEvent.TIMER_COMPLETE,analizar);
-				timer.start();
-			}else
-				this.analizarResultados();
+			}
 		}
 		
 		public function analizar(event:TimerEvent):void{
@@ -247,12 +244,12 @@
 			var ultimosPuntajes:Array = temp[0];
 			var cantPuntajes:int = temp[1];
 			for each(var puntaje:int  in ultimosPuntajes){
-				var obj:Object = new Object();
+				var obj:Puntaje = new Puntaje();
 				obj.image1 = "@Embed('/assets/images/rana-v2/Forma 7.png')";
-				obj.text1 = cantPuntajes;
+				obj.text1 = cantPuntajes+"";
 				obj.text2 = "tiro";
 				obj.text3 = "puntos";
-				obj.text4 = puntaje;
+				obj.text4 = puntaje+"";
 				listLanza.addItem(obj);
 				cantPuntajes--;
 			}
@@ -351,13 +348,18 @@
 					botones2[this.configuracionActiva].skin.setCurrentState('down');
 					
 					this.fachada.setParticipantePorJugador(configs2[this.configuracionActiva]);
-					
+					for each(var jugador:JugadorCustomComponent in this.jugadores){
+						if( this.fachada.getParticipantesPorJugador() == 1)
+							jugador.jugarIndividual();
+						else
+							jugador.jugarPorEquipos(this.fachada.getParticipantesPorJugador());
+					}
 					
 				}
 			}
 			
 			if(estado == 'Jugadores'){
-				if(key == Keyboard.ENTER){
+				if(key == Keyboard.ENTER && this.fachada.getCantidadJugadoresCredito()>0){
 					this.currentState = 'Principal';
 					this.iniciarNuevoJuego();
 				}
@@ -405,7 +407,10 @@
 					this.fachada.sumarPuntos(11);
 				else if(key == Keyboard.NUMPAD_9)
 					this.fachada.sumarPuntos(12);
-				else if(key == Keyboard.INSERT)
+			}
+			
+			if(estado == 'Principal' || estado == 'Ganaste'){
+				if(key == Keyboard.INSERT)
 					this.fachada.cambiarTurno(1);
 				else if(key == Keyboard.HOME)
 					this.fachada.cambiarTurno(2);
@@ -417,6 +422,9 @@
 					this.fachada.cambiarTurno(5);
 				else if(key == Keyboard.PAGE_DOWN)
 					this.fachada.cambiarTurno(6);
+				
+				if(estado == 'Ganaste')
+					this.currentState = 'Principal';
 			}
 		}
 		
@@ -452,16 +460,26 @@
 				this.timerLoop.stop();
 				
 
-			}else if(probabilidad % 10 == 0){
+			}/*else if(probabilidad % 10 == 0){
 				this.currentState = this.currentState == "Comenzar" ? "Puntajes" : "Comenzar"; 
 				this.timerLoop.stop();
 				
-			}
+			}*/
 				
 		}
 		
 		public function finVideo():void{
 			this.currentState = "Comenzar";
+		}
+		
+		public function timerGanador():void{
+			var timer:Timer = new Timer(1000,5);
+			timer.addEventListener(TimerEvent.TIMER_COMPLETE,function():void
+			{
+				this.currentState = "Principal";
+			});
+			//timer.start(); por ahora seria mejor solo cambiar de turno
+			
 		}
 			]]></fx:Script>
 	<s:states>
@@ -473,7 +491,7 @@
 		<s:State name="Principal"/>
 		<s:State name="Blanqueado"/>
 		<s:State name="FinJuego"/>
-		<s:State name="Ganaste"/>
+		<s:State name="Ganaste" enterState="timerGanador()"/>
 		<s:State name="Video"/>
 	</s:states>
 	
@@ -547,8 +565,8 @@
 					fontWeight="bold" kerning="off" lineHeight="222.95%" textAlign="right"
 					whiteSpaceCollapse="preserve"
 					x.FinJuego="93" y.FinJuego="251"
-					x.Ganaste="97.15" y.Ganaste="271.45">
-			<s:content><s:p><s:span>¡eres el ganador!</s:span></s:p></s:content>
+					x.Ganaste="94.15" y.Ganaste="335.45">
+			<s:content><s:p><s:span>¡Has llegado a la meta!</s:span></s:p></s:content>
 			<s:filters>
 				<s:GlowFilter includeIn="FinJuego" blurX="12" blurY="12" color="#000000"
 							  quality="{BitmapFilterQuality.HIGH}" strength="3"/>
@@ -558,9 +576,9 @@
 			</s:filters>
 		</s:RichText>
 		<s:RichText id="lbl_nomJugador" d:userLabel="g-ereselganador" includeIn="Ganaste" x="102.6"
-					y="172.9" color="#ffffff" fontFamily="Counter-Strike" fontSize="84.098"
-					fontWeight="bold" kerning="off" lineHeight="222.95%" text="Jugador 1&#xd;"
-					textAlign="right" whiteSpaceCollapse="preserve">
+					y="172.9" height="139" color="#ffffff" fontFamily="Counter-Strike"
+					fontSize="84.098" fontWeight="bold" kerning="off" lineHeight="222.95%"
+					text="Jugador 1&#xd;" textAlign="right" whiteSpaceCollapse="preserve">
 		<s:filters>
 			<s:DropShadowFilter alpha="0.9" angle="90" blurY="30" color="#252525" distance="25"
 								hideObject="false" inner="true" knockout="false" quality="2"
@@ -635,7 +653,7 @@
 					x="361" y="496" color="#ffffff" fontFamily="Counter-Strike" fontSize="69.81"
 					fontWeight="bold" kerning="off" lineHeight="652.7%" textAlign="right"
 					whiteSpaceCollapse="preserve">
-			<s:content><s:p><s:span>Credito</s:span></s:p></s:content>
+			<s:content><s:p><s:span>Crédito</s:span></s:p></s:content>
 		</s:RichText>
 		<s:Button id="button5" d:userLabel="j-jugador6"
 				  includeIn="Blanqueado,Comenzar,FinJuego,Jugadores,Principal" x="1051" y="135"
@@ -669,34 +687,35 @@
 					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
 					   x="0" y="0" smooth="true" source="@Embed('/assets/images/rana-v2/Fondo.png')"/>
 		<components:JugadorCustomComponent id="jugador6" d:userLabel="ta-jugador6"
-										   includeIn="Comenzar,Principal" x="16" y="591"
+										   includeIn="Comenzar,Principal,Ganaste" x="16" y="591"
 										   currentState="desactivado"
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador5" d:userLabel="ta-jugador5"
-										   includeIn="Comenzar,Principal" x="16" y="476"
+										   includeIn="Comenzar,Principal,Ganaste" x="16" y="476"
 										   currentState="desactivado"
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador4" d:userLabel="ta-jugador4"
-										   includeIn="Comenzar,Principal" x="16" y="361"
+										   includeIn="Comenzar,Principal,Ganaste" x="16" y="361"
 										   currentState="desactivado"
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador3" d:userLabel="ta-jugador3"
-										   includeIn="Comenzar,Principal" x="16" y="245"
+										   includeIn="Comenzar,Principal,Ganaste" x="16" y="245"
 										   currentState="desactivado"
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador2" d:userLabel="ta-jugador2"
-										   includeIn="Comenzar,Principal" x="16" y="129"
+										   includeIn="Comenzar,Principal,Ganaste" x="16" y="129"
 										   currentState="desactivado"
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador1" d:userLabel="ta-jugador1"
-										   includeIn="Comenzar,Principal" x="16" y="13"
+										   includeIn="Comenzar,Principal,Ganaste" x="16" y="13"
 										   currentState="desactivado"
-										   visible.Principal="true">
+										   visible.Principal="true"
+										   currentState.Principal="desactivado">
 		</components:JugadorCustomComponent>
 		<s:BitmapImage d:userLabel="Forma 4 copia"
 					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
@@ -813,7 +832,7 @@
 		</fx:DesignLayer>
 		<fx:DesignLayer d:userLabel="Turno actual">
 			<s:List id="lst_puntajes_turnos" d:userLabel="ta-datalistturnos" includeIn="Principal"
-					visible="false" x="319" y="472" skinClass="components.UltimosPuntajes">
+				 x="319" y="472" skinClass="components.UltimosPuntajes">
 				<s:ArrayCollection>
 					<fx:Object image1="@Embed('/assets/images/rana-v2/Forma 7.png')" text1="3"
 							   text2="tiro" text3="puntos" text4="900"/>
@@ -864,7 +883,7 @@
 						color.Blanqueado="#F69C00" text.Blanqueado="80"
 						color.FinJuego="#F69C00" text.FinJuego="80"
 						x.Principal="469" y.Principal="92" width.Principal="200"
-						color.Principal="#F69C00" textAlign.Principal="center" text.Principal="80">
+						color.Principal="#F69C00" textAlign.Principal="center" text.Principal="0">
 				<s:content.TipoDeJuego><s:p><s:span>80</s:span></s:p></s:content.TipoDeJuego>
 				<s:content.Jugadores><s:p><s:span>80</s:span></s:p></s:content.Jugadores>
 				<s:content.Comenzar><s:p><s:span>80</s:span></s:p></s:content.Comenzar>
@@ -902,30 +921,42 @@
 					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
 					  x="537" y="149" label="20" enabled="false" skinClass="components.Button4"
 					  x.Principal="537" y.Principal="127"/>
-			<s:Button id="btn_lanz7" d:userLabel="ta-puntoshueco1" includeIn="Comenzar,Principal" x="318"
-					  y="325" label="120" enabled="true" skinClass="components.Button4"/>
-			<s:Button id="btn_lanz8" d:userLabel="ta-puntoshueco2" includeIn="Comenzar,Principal" x="427"
-					  y="325" label="20" enabled="false" skinClass="components.Button4"/>
-			<s:Button id="btn_lanz9" d:userLabel="ta-puntoshueco3" includeIn="Comenzar,Principal" x="537"
-					  y="325" label="20" enabled="false" skinClass="components.Button4"/>
-			<s:Button id="btn_lanz10" d:userLabel="ta-puntoshueco4" includeIn="Comenzar,Principal" x="318"
-					  y="424" label="20" enabled="false" skinClass="components.Button4"/>
-			<s:Button id="btn_lanz11" d:userLabel="ta-puntoshueco5" includeIn="Comenzar,Principal" x="427"
-					  y="424" label="30" enabled="false" skinClass="components.Button4"/>
-			<s:Button id="btn_lanz12" d:userLabel="ta-puntoshueco6" includeIn="Comenzar,Principal" x="537"
-					  y="424" label="20" enabled="false" skinClass="components.Button4"/>
-			<s:Button id="btn_lanz13" d:userLabel="ta-puntoshueco1" includeIn="Comenzar,Principal" x="318"
-					  y="524" label="20" enabled="true" skinClass="components.Button4"/>
-			<s:Button id="btn_lanz14" d:userLabel="ta-puntoshueco2" includeIn="Comenzar,Principal" x="427"
-					  y="524" label="20" enabled="false" skinClass="components.Button4"/>
-			<s:Button id="btn_lanz15" d:userLabel="ta-puntoshueco3" includeIn="Comenzar,Principal" x="537"
-					  y="524" label="20" enabled="false" skinClass="components.Button4"/>
-			<s:Button id="btn_lanz16" d:userLabel="ta-puntoshueco4" includeIn="Comenzar,Principal" x="318"
-					  y="623" label="20" enabled="false" skinClass="components.Button4"/>
-			<s:Button id="btn_lanz17" d:userLabel="ta-puntoshueco5" includeIn="Comenzar,Principal" x="427"
-					  y="623" label="30" enabled="false" skinClass="components.Button4"/>
-			<s:Button id="btn_lanz18" d:userLabel="ta-puntoshueco6" includeIn="Comenzar,Principal" x="537"
-					  y="623" label="20" enabled="false" skinClass="components.Button4"/>
+			<s:Button id="btn_lanz7" d:userLabel="ta-puntoshueco1" includeIn="Comenzar,Principal"
+					  x="318" y="325" label="120" enabled="true" skinClass="components.Button4"
+					  visible.Principal="false"/>
+			<s:Button id="btn_lanz8" d:userLabel="ta-puntoshueco2" includeIn="Comenzar,Principal"
+					  x="427" y="325" label="20" enabled="false" skinClass="components.Button4"
+					  visible.Principal="false"/>
+			<s:Button id="btn_lanz9" d:userLabel="ta-puntoshueco3" includeIn="Comenzar,Principal"
+					  x="537" y="325" label="20" enabled="false" skinClass="components.Button4"
+					  visible.Principal="false"/>
+			<s:Button id="btn_lanz10" d:userLabel="ta-puntoshueco4" includeIn="Comenzar,Principal"
+					  x="318" y="424" label="20" enabled="false" skinClass="components.Button4"
+					  visible.Principal="false"/>
+			<s:Button id="btn_lanz11" d:userLabel="ta-puntoshueco5" includeIn="Comenzar,Principal"
+					  x="427" y="424" label="30" enabled="false" skinClass="components.Button4"
+					  visible.Principal="false"/>
+			<s:Button id="btn_lanz12" d:userLabel="ta-puntoshueco6" includeIn="Comenzar,Principal"
+					  x="537" y="424" label="20" enabled="false" skinClass="components.Button4"
+					  visible.Principal="false"/>
+			<s:Button id="btn_lanz13" d:userLabel="ta-puntoshueco1" includeIn="Comenzar,Principal"
+					  x="318" y="524" label="20" enabled="true" skinClass="components.Button4"
+					  visible.Principal="false"/>
+			<s:Button id="btn_lanz14" d:userLabel="ta-puntoshueco2" includeIn="Comenzar,Principal"
+					  x="427" y="524" label="20" enabled="false" skinClass="components.Button4"
+					  visible.Principal="false"/>
+			<s:Button id="btn_lanz15" d:userLabel="ta-puntoshueco3" includeIn="Comenzar,Principal"
+					  x="537" y="524" label="20" enabled="false" skinClass="components.Button4"
+					  visible.Principal="false"/>
+			<s:Button id="btn_lanz16" d:userLabel="ta-puntoshueco4" includeIn="Comenzar,Principal"
+					  x="318" y="623" label="20" enabled="false" skinClass="components.Button4"
+					  visible.Principal="false"/>
+			<s:Button id="btn_lanz17" d:userLabel="ta-puntoshueco5" includeIn="Comenzar,Principal"
+					  x="427" y="623" label="30" enabled="false" skinClass="components.Button4"
+					  visible.Principal="false"/>
+			<s:Button id="btn_lanz18" d:userLabel="ta-puntoshueco6" includeIn="Comenzar,Principal"
+					  x="537" y="623" label="20" enabled="false" skinClass="components.Button4"
+					  visible.Principal="false"/>
 			<s:Button id="btn_lanz4" d:userLabel="ta-puntoshueco4"
 					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
 					  x="318" y="258" label="20" enabled="false" skinClass="components.Button4"
