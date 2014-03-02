@@ -3,7 +3,7 @@ package model {
 	
 	import util.RanaException;
 
-	public class JuegoRana extends EventDispatcher{
+	public class ChicoRana extends EventDispatcher{
 		
 		private var numJugadores:int;
 		private var puntajeMaximo:int;
@@ -14,14 +14,36 @@ package model {
 		private var configuracion:Configuracion;
 		private var maxLanzamientos:int;
 		
-		public function JuegoRana(configuracion:Configuracion){
+		private var puestos:Array;
+		
+		public function ChicoRana(configuracion:Configuracion){
 			this.numJugadores = 0;
 			this.puntajeMaximo = 0;
 			this.turno = -1;
 			this.jugadores = new Array();
 			this.puntajesTurno = new Array();
+			this.puestos = new Array();
 			this.puntajeTurno = 0;
 			this.configuracion = configuracion;
+			
+			this.addEventListener(RanaEvento.GANADOR,nuevoGanador);
+		}
+		
+		public function nuevoGanador(evento:RanaEvento, datos:Array):void{
+			//datos es> puntaje, this.puntajeTurno, orificio, this.puntajeMaximo, jugador
+			this.puestos.push(datos[4]);
+			//Reviso si no se ha terminado el juego
+			var jugadoresActivos:int = 0;
+			for each (var jugador:Jugador in jugadores){
+				jugadoresActivos += jugador.getEstado()?1:0;
+			}
+			if(jugadoresActivos == 1)
+				this.finalizarJuego(RanaEvento.FIN_JUEGO_NORMAL);
+			
+		}
+		
+		public function getPuestos():Array{
+			return puestos;
 		}
 		
 		public function setNumJugadores(valor:int):void {
@@ -142,6 +164,12 @@ package model {
 		/** 
 		 * Este metodo sera lanzado una vez todos menos uno de los jugadores alcanze o supere el puntaje maximo.
 		 * Internamente se calculara si uno de los participantes obtuvo un nuevo record en la rana.
+		 * 
+		 * Casos de finalizacion>
+		 * Sin blanqueadas>
+		 *   Todos juegan y al final el que este activo (por no llegar al maximo) es el perdedor
+		 * Con blanqueadas>
+		 *   El que se blanquea queda como perdedor, si hay varios, todos son perdedores. (podrian ser todos)
 		 */
 		public function finalizarJuego(tipo:String):void {			
 			dispatchEvent(new RanaEvento(RanaEvento.RANA_TERMINAR_JUEGO,tipo));

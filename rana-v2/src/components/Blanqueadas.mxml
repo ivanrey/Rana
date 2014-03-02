@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Skin xmlns:s="library://ns.adobe.com/flex/spark" xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:d="http://ns.adobe.com/fxg/2008/dt">
+<s:Skin xmlns:s="library://ns.adobe.com/flex/spark" xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:components="components.*">
 	<fx:Metadata>[HostComponent("spark.components.List")]</fx:Metadata>
 	<s:states>
 		<s:State name="normal"/>
 		<s:State name="disabled"/>
 	</s:states>
-	<s:DataGroup clipAndEnableScrolling="true" height="66" height.normal="440" id="dataGroup" itemRenderer="components.RepeatedItem4" width="678" x="0" y="0" d:userLabel="Repeated Item">
+	<s:DataGroup clipAndEnableScrolling="true" height="48" height.normal="20" id="dataGroup" itemRenderer="components.ItemBlanqueada" width="20" width.normal="150" x="0" y="0">
 		<s:layout>
 			<s:VerticalLayout/>
 		</s:layout>
+		<s:layout.normal>
+			<s:HorizontalLayout/>
+		</s:layout.normal>
 	</s:DataGroup>
 	<s:transitions>
 		<s:Transition fromState="normal" toState="disabled" autoReverse="true">

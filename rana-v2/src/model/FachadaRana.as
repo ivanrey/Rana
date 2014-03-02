@@ -12,7 +12,7 @@ package model {
 		private var credito:int;
 		private var conf:Configuracion;
 		private var recordsVar:Records;
-		private var juego:JuegoRana;
+		private var chico:ChicoRana;
 		private var participantesPorJugador:int;
 		
 		public function FachadaRana():void{
@@ -44,7 +44,7 @@ package model {
 			return this.credito;
 		}
 		public function consultarTurno():int{
-			return this.juego.getTurno();
+			return this.chico.getTurno();
 		}
 		public function getMaximoBlanqueadas():int{
 			return this.conf.getMaxBlanqueadas();
@@ -62,13 +62,13 @@ package model {
 				throw new RanaException('El tipo de juego ingresado no ha sido definido');
 		}
 		
-		public function iniciarJuego():void {
+		public function iniciarChico():void {
 			var numJugadores:int = this.getCantidadJugadoresCredito();
-			this.juego = new JuegoRana(this.conf);
-			this.juego.setPuntajeMaximo(this.puntajeMaximo);
-			this.juego.setNumJugadores(numJugadores);
-			this.juego.setParticipantesPorJugador(this.participantesPorJugador);
-			this.juego.iniciarJuego();
+			this.chico = new ChicoRana(this.conf);
+			this.chico.setPuntajeMaximo(this.puntajeMaximo);
+			this.chico.setNumJugadores(numJugadores);
+			this.chico.setParticipantesPorJugador(this.participantesPorJugador);
+			this.chico.iniciarJuego();
 			
 			this.addListeners();
 			
@@ -80,13 +80,13 @@ package model {
 		}
 		
 		public function sumarPuntos(orificio:int):void {
-			this.juego.registrarLanzamiento(orificio);
+			this.chico.registrarLanzamiento(orificio);
 		}
 		public function cambiarTurno(nuevoTurno:int):void{
-			this.juego.cambiarTurno(nuevoTurno);
+			this.chico.cambiarTurno(nuevoTurno);
 		}
 		private function getJugadorActual():Jugador {
-			return this.juego.getJugadorEnTurno();
+			return this.chico.getJugadorEnTurno();
 		}
 		public function getUltimosPuntajes():Array {
 			return new Array(this.getJugadorActual().getUltimosResultados(3), this.getJugadorActual().getCantidadLanzamientos());	
@@ -95,7 +95,7 @@ package model {
 			return this.recordsVar.getRecords();
 		}
 		public function getNumJugadores():int{
-			return this.juego.getNumJugadores();
+			return this.chico.getNumJugadores();
 		}
 		
 		public function getPuntajeMaximo():int{
@@ -103,7 +103,7 @@ package model {
 		}
 		
 		public function getMaxLanzamientos():int{
-			return this.juego.getMaxLanzamientos();
+			return this.chico.getMaxLanzamientos();
 		}
 		
 		public function setParticipantePorJugador( participantes:int):void{
@@ -115,7 +115,7 @@ package model {
 		}
 		
 		public function analizarRecords():Array{
-			var puntajes:Array = this.juego.getPromediosJugadores();
+			var puntajes:Array = this.chico.getPromediosJugadores();
 			var records:Array = new Array();
 			var esRecord:Boolean = new Boolean();
 			for each(var punta:Array in puntajes){
@@ -130,17 +130,25 @@ package model {
 		}
 		
 		public function getJugadoresActivos():int{
-			return this.juego.getCantidadJugadoresActivos();
+			return this.chico.getCantidadJugadoresActivos();
+		}
+		
+		/**
+		 * Se ha terminado el chico, ahora debemos revisar quien gano y quien perdio
+		 */ 
+		private function finDelChico():void{
+			var ganadores = this.chico.getPuestos();
+			
 		}
 		
 		private function addListeners():void{
-			this.juego.addEventListener(RanaEvento.RANA_ARGOLLA_INSERTADA,fireEvent);
-			this.juego.addEventListener(RanaEvento.RANA_TURNO_CAMBIADO,fireEvent);
-			this.juego.addEventListener(RanaEvento.RANA_PUNTAJE_CAMBIO,fireEvent);
-			this.juego.addEventListener(RanaEvento.RANA_BLANQUEADO,fireEvent);
-			this.juego.addEventListener(RanaEvento.RANA_JUGADOR_DESACTIVADO,fireEvent);
-			this.juego.addEventListener(RanaEvento.RANA_TERMINAR_JUEGO,fireEvent);
-			this.juego.addEventListener(RanaEvento.GANADOR,fireEvent);
+			this.chico.addEventListener(RanaEvento.RANA_ARGOLLA_INSERTADA,fireEvent);
+			this.chico.addEventListener(RanaEvento.RANA_TURNO_CAMBIADO,fireEvent);
+			this.chico.addEventListener(RanaEvento.RANA_PUNTAJE_CAMBIO,fireEvent);
+			this.chico.addEventListener(RanaEvento.RANA_BLANQUEADO,fireEvent);
+			this.chico.addEventListener(RanaEvento.RANA_JUGADOR_DESACTIVADO,fireEvent);
+			this.chico.addEventListener(RanaEvento.RANA_TERMINAR_JUEGO,fireEvent);
+			this.chico.addEventListener(RanaEvento.GANADOR,fireEvent);
 		}
 		
 		private function fireEvent(event:RanaEvento):void{
@@ -163,6 +171,7 @@ package model {
 					break;
 				case RanaEvento.RANA_TERMINAR_JUEGO:
 					this.sonar("blanqueado");
+					this.finDelChico();
 					break;
 				case RanaEvento.GANADOR:
 					this.sonar("ganador");

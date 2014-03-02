@@ -4,7 +4,7 @@
 		<s:State name="Juega"/>
 		<s:State name="NoJuega"/>
 	</s:states>
-	<s:Button id="button0" label="jugador 3" skinClass="components.Capa4Button" x="0" y="0" alpha.NoJuega="0.3"/>
+	<s:Button id="button0" label="jugador 3" skinClass="components.ItemSeleccionJugador" x="0" y="0" alpha.NoJuega="0.3"/>
 	<s:transitions>
 		<s:Transition fromState="NoJuega" toState="Juega" autoReverse="true">
 			<s:Parallel>

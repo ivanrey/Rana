@@ -5,7 +5,7 @@
 		<s:State name="normal"/>
 		<s:State name="disabled"/>
 	</s:states>
-	<s:DataGroup itemRenderer="components.RepeatedItem2" y="0" id="dataGroup" width="339" height="249" clipAndEnableScrolling="true" x="0">
+	<s:DataGroup itemRenderer="components.ItemUltimoPuntaje" y="0" id="dataGroup" width="339" height="249" clipAndEnableScrolling="true" x="0">
 		<s:layout>
 			<s:VerticalLayout/>
 		</s:layout>

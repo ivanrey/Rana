@@ -5,8 +5,8 @@
 		<s:State name="hovered"/>
 		<s:State name="selected"/>
 	</s:states>
-	<components:ranaonCustomComponent x="0" y="0">
-	</components:ranaonCustomComponent>
+	<components:RanitaBlanqueada x="0" y="0">
+	</components:RanitaBlanqueada>
 	<s:Rect d:userLabel="Item Highlight Rectangle" width="20" height="16" alpha.normal="0" alpha.hovered="0.3" alpha.selected="0.5">
 		<s:fill>
 			<s:SolidColor color="0xCED7EE"/>

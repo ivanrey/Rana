@@ -14,13 +14,14 @@
 		import model.Configuracion;
 		import model.FachadaRana;
 		import model.RanaEvento;
-		import util.Puntaje;
 		
 		import mx.controls.Alert;
 		import mx.controls.VideoDisplay;
 		import mx.core.UIComponent;
 		
 		import spark.components.VideoPlayer;
+		
+		import util.Puntaje;
 		
 		private var fachada:FachadaRana;
 		private var arrayJugadoresGraf:Array = new Array();
@@ -57,17 +58,7 @@
 			this.lanzamientos[4] = this.btn_lanz5;
 			this.lanzamientos[5] = this.btn_lanz6;
 			this.lanzamientos[6] = this.btn_lanz7;
-			this.lanzamientos[7] = this.btn_lanz8;
-			this.lanzamientos[8] = this.btn_lanz9;
-			this.lanzamientos[9] = this.btn_lanz10;
-			this.lanzamientos[10] = this.btn_lanz11;
-			this.lanzamientos[11] = this.btn_lanz12;
-			this.lanzamientos[12] = this.btn_lanz13;
-			this.lanzamientos[13] = this.btn_lanz14;
-			this.lanzamientos[14] = this.btn_lanz15;
-			this.lanzamientos[15] = this.btn_lanz16;
-			this.lanzamientos[16] = this.btn_lanz17;
-			this.lanzamientos[17] = this.btn_lanz18;
+			
 			
 			// Guardamos las monedas que representan los valores de los orificios
 			this.orificios[1] = bmp_orificio1;
@@ -103,7 +94,15 @@
 			this.fachada.addEventListener(RanaEvento.RANA_BLANQUEADO,blanquearJugador);
 			this.fachada.addEventListener(RanaEvento.RANA_JUGADOR_DESACTIVADO,desactivarJugador);
 			this.fachada.addEventListener(RanaEvento.GANADOR,ganador);
+			this.fachada.addEventListener(RanaEvento.RANA_TERMINAR_JUEGO, finChico);
 			
+		}
+		
+		/**
+		 * Se ha finalizado el chico porque solo queda un jugador.
+		 * El jugador activo podria ser el ganador si nadie ha ganado (por ejemplo porque se blanquearon)
+		 */ 
+		public function finChico(event:RanaEvento):void{
 			
 		}
 		
@@ -145,41 +144,6 @@
 			}
 		}
 		
-		public function analizar(event:TimerEvent):void{
-			this.analizarResultados();
-		}
-		
-		public function analizarResultados():void{
-			this.nuevosRecords = this.fachada.analizarRecords();
-			if(this.nuevosRecords.length > 0){
-				this.guardarRecords(null);
-			}
-			else
-				this.currentState = "Comenzar";
-		}
-		
-		public function guardarRecords(event:TimerEvent = null):void{
-			if(this.nuevosRecords.length == 0)
-				this.currentState = "Comenzar";
-			else{
-				this.timerRecords = new Timer(1000,20);
-				this.timerRecords.addEventListener(TimerEvent.TIMER_COMPLETE,guardarRecords);
-				this.timerRecords.addEventListener(TimerEvent.TIMER,refrescarCountDown);
-				this.currentState = "FinJuego";
-				this.numLetra = 0;
-				this.lbl_nom_record.text = "";
-				var record:Array = this.nuevosRecords.pop();
-				this.numJugador = record[0];
-				this.record = record[1];
-				this.lbl_nom_jugador_rec.text = "Jugador "+this.numJugador;
-				this.timerRecords.start();
-			}
-		}
-		
-		public function refrescarCountDown(event:TimerEvent):void{
-			this.richtext998.text = (20-event.target.currentCount).toString();
-		}
-		
 		public function desactivarJugador(event:RanaEvento):void{
 			this.jugadores[event.params-1].inicializado = false;
 			this.jugadores[event.params-1].visible = false;
@@ -211,8 +175,8 @@
 			}
 		}
 		
-		public function iniciarNuevoJuego():void{
-			this.fachada.iniciarJuego();
+		public function iniciarNuevoChico():void{
+			this.fachada.iniciarChico();
 			var maxJugadores:int = this.fachada.getNumJugadores();
 			var i:int = 0;
 			for each(var jugador:JugadorCustomComponent in this.jugadores){
@@ -359,27 +323,14 @@
 			}
 			
 			if(estado == 'Jugadores'){
-				if(key == Keyboard.ENTER && this.fachada.getCantidadJugadoresCredito()>0){
+				if(key == Keyboard.ENTER && this.fachada.getCantidadJugadoresCredito()>1){ //Se quiere que juegue solo una persona para practicar??
 					this.currentState = 'Principal';
-					this.iniciarNuevoJuego();
+					this.iniciarNuevoChico();
 				}
 			}
 			
 			if(estado == "FinJuego"){
-				if(key == Keyboard.NUMPAD_MULTIPLY){
-					this.numLetra = this.numLetra == 0 ? 25 : this.numLetra-1;
-					this.lbl_nom_record.text = this.lbl_nom_record.text.substr(0,this.lbl_nom_record.text.length-1)+this.alfabeto.getLetraAt(this.numLetra);
-				}else if(key == Keyboard.NUMPAD_SUBTRACT){
-					this.numLetra = this.numLetra == 25 ? 0 : this.numLetra+1;
-					this.lbl_nom_record.text = this.lbl_nom_record.text.substr(0,this.lbl_nom_record.text.length-1)+this.alfabeto.getLetraAt(this.numLetra);
-				}else if(key == Keyboard.NUMPAD_DIVIDE){
-					this.lbl_nom_record.text = this.lbl_nom_record.text+"a";
-					this.numLetra = 0;
-				}else if(key == Keyboard.ENTER){
-					this.timerRecords.stop();
-					this.fachada.salvarRecord(this.lbl_nom_record.text,this.record);
-					this.timerRecords.dispatchEvent(new TimerEvent(TimerEvent.TIMER_COMPLETE));
-				}
+				
 			}
 			
 			if(estado == 'Principal'){
@@ -533,7 +484,7 @@
 		<s:BitmapImage id="bitmapimage4" d:userLabel="r-titulo" includeIn="Puntajes" x="366" y="78"
 					   smooth="true" source="@Embed('/assets/images/rana-v2/RANKING.png')"/>
 		<s:List id="lst_records" d:userLabel="r-datalist" includeIn="Puntajes" x="352" y="196"
-				enabled="true" skinClass="components.DataList2" textAlign="left">
+				enabled="true" skinClass="components.ListaRecords" textAlign="left">
 			<s:ArrayCollection>
 				<fx:Object text1="APODOPERSONAJE" text2="79,3%"/>
 				<fx:Object text1="OTRO" text2="85.5%"/>
@@ -657,23 +608,23 @@
 		</s:RichText>
 		<s:Button id="button5" d:userLabel="j-jugador6"
 				  includeIn="Blanqueado,Comenzar,FinJuego,Jugadores,Principal" x="1051" y="135"
-				  label="jugador 6" enabled="false" skinClass="components.Capa4Button"/>
+				  label="jugador 6" enabled="false" skinClass="components.ItemSeleccionJugador"/>
 		<s:Button id="button4" d:userLabel="j-jugador5"
 				  includeIn="Blanqueado,Comenzar,FinJuego,Jugadores,Principal" x="855" y="135"
-				  label="jugador 5" enabled="false" skinClass="components.Capa4Button"
+				  label="jugador 5" enabled="false" skinClass="components.ItemSeleccionJugador"
 				  label.Jugadores="jugador 5"/>
 		<s:Button id="button3" d:userLabel="j-jugador4"
 				  includeIn="Blanqueado,Comenzar,FinJuego,Jugadores,Principal" x="656" y="136"
-				  label="jugador 4" enabled="false" skinClass="components.Capa4Button"/>
+				  label="jugador 4" enabled="false" skinClass="components.ItemSeleccionJugador"/>
 		<s:Button id="button2" d:userLabel="j-jugador3" includeIn="Comenzar,Jugadores" x="460"
-				  y="136" label="jugador 3" enabled="false" skinClass="components.Capa4Button"
+				  y="136" label="jugador 3" enabled="false" skinClass="components.ItemSeleccionJugador"
 				  label.Jugadores="jugador 3"/>
 		<s:Button id="button1" d:userLabel="j-jugador2"
 				  includeIn="Blanqueado,Comenzar,FinJuego,Jugadores,Principal" x="264" y="135"
-				  label="jugador 2" enabled="false" skinClass="components.Capa4Button"/>
+				  label="jugador 2" enabled="false" skinClass="components.ItemSeleccionJugador"/>
 		<s:Button id="button0" d:userLabel="j-jugador1"
 				  includeIn="Blanqueado,Comenzar,FinJuego,Jugadores,Principal" x="65" y="136"
-				  label="jugador 1" enabled="false" skinClass="components.Capa4Button"/>
+				  label="jugador 1" enabled="false" skinClass="components.ItemSeleccionJugador"/>
 	</fx:DesignLayer>
 	<fx:DesignLayer id="designlayer5" d:userLabel="TurnoActual"
 					visible.Blanqueado="false"
@@ -911,64 +862,32 @@
 			</s:RichText>
 			<s:Button id="btn_lanz1" d:userLabel="ta-puntoshueco1"
 					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					  x="318" y="149" label="120" enabled="true" skinClass="components.Button4"
+					  x="318" y="149" label="120" enabled="true" skinClass="components.Orificio"
 					  x.Principal="318" y.Principal="127" label.Principal="120"/>
 			<s:Button id="btn_lanz2" d:userLabel="ta-puntoshueco2"
 					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					  x="427" y="149" label="20" enabled="false" skinClass="components.Button4"
+					  x="427" y="149" label="20" enabled="false" skinClass="components.Orificio"
 					  x.Principal="427" y.Principal="127"/>
 			<s:Button id="btn_lanz3" d:userLabel="ta-puntoshueco3"
 					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					  x="537" y="149" label="20" enabled="false" skinClass="components.Button4"
+					  x="537" y="149" label="20" enabled="false" skinClass="components.Orificio"
 					  x.Principal="537" y.Principal="127"/>
-			<s:Button id="btn_lanz7" d:userLabel="ta-puntoshueco1" includeIn="Comenzar,Principal"
-					  x="318" y="325" label="120" enabled="true" skinClass="components.Button4"
-					  visible.Principal="false"/>
-			<s:Button id="btn_lanz8" d:userLabel="ta-puntoshueco2" includeIn="Comenzar,Principal"
-					  x="427" y="325" label="20" enabled="false" skinClass="components.Button4"
-					  visible.Principal="false"/>
-			<s:Button id="btn_lanz9" d:userLabel="ta-puntoshueco3" includeIn="Comenzar,Principal"
-					  x="537" y="325" label="20" enabled="false" skinClass="components.Button4"
-					  visible.Principal="false"/>
-			<s:Button id="btn_lanz10" d:userLabel="ta-puntoshueco4" includeIn="Comenzar,Principal"
-					  x="318" y="424" label="20" enabled="false" skinClass="components.Button4"
-					  visible.Principal="false"/>
-			<s:Button id="btn_lanz11" d:userLabel="ta-puntoshueco5" includeIn="Comenzar,Principal"
-					  x="427" y="424" label="30" enabled="false" skinClass="components.Button4"
-					  visible.Principal="false"/>
-			<s:Button id="btn_lanz12" d:userLabel="ta-puntoshueco6" includeIn="Comenzar,Principal"
-					  x="537" y="424" label="20" enabled="false" skinClass="components.Button4"
-					  visible.Principal="false"/>
-			<s:Button id="btn_lanz13" d:userLabel="ta-puntoshueco1" includeIn="Comenzar,Principal"
-					  x="318" y="524" label="20" enabled="true" skinClass="components.Button4"
-					  visible.Principal="false"/>
-			<s:Button id="btn_lanz14" d:userLabel="ta-puntoshueco2" includeIn="Comenzar,Principal"
-					  x="427" y="524" label="20" enabled="false" skinClass="components.Button4"
-					  visible.Principal="false"/>
-			<s:Button id="btn_lanz15" d:userLabel="ta-puntoshueco3" includeIn="Comenzar,Principal"
-					  x="537" y="524" label="20" enabled="false" skinClass="components.Button4"
-					  visible.Principal="false"/>
-			<s:Button id="btn_lanz16" d:userLabel="ta-puntoshueco4" includeIn="Comenzar,Principal"
-					  x="318" y="623" label="20" enabled="false" skinClass="components.Button4"
-					  visible.Principal="false"/>
-			<s:Button id="btn_lanz17" d:userLabel="ta-puntoshueco5" includeIn="Comenzar,Principal"
-					  x="427" y="623" label="30" enabled="false" skinClass="components.Button4"
-					  visible.Principal="false"/>
-			<s:Button id="btn_lanz18" d:userLabel="ta-puntoshueco6" includeIn="Comenzar,Principal"
-					  x="537" y="623" label="20" enabled="false" skinClass="components.Button4"
-					  visible.Principal="false"/>
 			<s:Button id="btn_lanz4" d:userLabel="ta-puntoshueco4"
 					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					  x="318" y="258" label="20" enabled="false" skinClass="components.Button4"
+					  x="318" y="258" label="20" enabled="false" skinClass="components.Orificio"
 					  x.Principal="318" y.Principal="226"/>
 			<s:Button id="btn_lanz5" d:userLabel="ta-puntoshueco5"
 					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					  x="427" y="258" label="30" enabled="false" skinClass="components.Button4"
+					  x="427" y="258" label="30" enabled="false" skinClass="components.Orificio"
 					  x.Principal="427" y.Principal="226"/>
 			<s:Button id="btn_lanz6" d:userLabel="ta-puntoshueco6"
 					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					  x="537" y="258" label="20" enabled="false" skinClass="components.Button4"
+					  x="537" y="258" label="20" enabled="false" skinClass="components.Orificio"
 					  x.Principal="537" y.Principal="226"/>
+			<s:Button id="btn_lanz7" d:userLabel="ta-puntoshueco1" includeIn="Comenzar,Principal"
+					  x="318" y="325" label="120" enabled="true" skinClass="components.Orificio"
+					  visible.Principal="false"/>
+			
 		</fx:DesignLayer>
 		<s:RichText d:userLabel="ta-tipodejuego"
 					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
@@ -1043,287 +962,12 @@
 		<s:BitmapImage d:userLabel="g-fondo"
 					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
 					   x="0" y="0" smooth="true" source="@Embed('/assets/images/rana-v2/Fondo.png')"/>
-		<s:RichText id="lbl_nom_jugador_rec" d:userLabel="g-ereselganador" includeIn="FinJuego"
-					x="415.6" y="167.9" height="73" color="#ffffff" fontFamily="Counter-Strike"
-					fontSize="84.098" fontWeight="bold" kerning="off" lineHeight="95%"
-					text="Jugador 1" textAlign="right" whiteSpaceCollapse="preserve">
-			<s:filters>
-				<s:DropShadowFilter alpha="0.9" angle="90" blurY="30" color="#252525" distance="25"
-									hideObject="false" inner="true" knockout="false" quality="2"
-									strength="1"/>
-			</s:filters>
-		</s:RichText>
-		<s:BitmapImage d:userLabel="g-felicitaciones"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					   x="95" y="80" smooth="true"
-					   source="@Embed('/assets/images/rana-v2/FELICITACIONES.png')"/>
 		<s:BitmapImage d:userLabel="g-rana"
 					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
 					   x="899" y="197" smooth="true"
 					   source="@Embed('/assets/images/rana-v2/rana_felicitaciones.png')"
 					   x.FinJuego="899" y.FinJuego="198"/>
-		<s:RichText d:userLabel="g-paracontinuar"
-					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					x="94" y="187" color="#ffffff" fontFamily="Counter-Strike" fontSize="49.836"
-					fontWeight="bold" kerning="off" lineHeight="96%" textAlign="center"
-					whiteSpaceCollapse="preserve"
-					x.FinJuego="93" y.FinJuego="244" width.FinJuego="695" height.FinJuego="97">
-			<s:content><s:p><s:span>has impuesto un nuevo</s:span></s:p><s:p><s:span>record!</s:span></s:p></s:content>
-		</s:RichText>
-		<s:RichText d:userLabel="g-paracontinuar"
-					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					x="86" y="552" color="#ffffff" fontFamily="Counter-Strike" fontSize="49.836"
-					fontWeight="bold" kerning="off" lineHeight="96%" textAlign="center"
-					whiteSpaceCollapse="preserve">
-			<s:content><s:p><s:span>PARA CONTINUAR JUGANDO</s:span></s:p><s:p><s:span>DEBEN INGRESAR:</s:span></s:p></s:content>
-		</s:RichText>
-		<s:RichText id="richtext998" d:userLabel="g-precio"
-					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					x="319" y="657" color="#ff7e00" fontFamily="Counter-Strike" fontSize="93.48"
-					fontWeight="bold" kerning="off" lineHeight="652.7%" textAlign="right"
-					whiteSpaceCollapse="preserve">
-			<s:content><s:p><s:span>$600</s:span></s:p></s:content>
-			<s:filters>
-				<s:DropShadowFilter includeIn="FinJuego" alpha="1" angle="45.0" blurX="6" blurY="6"
-									color="0x000000" distance="0" hideObject="false" inner="true"
-									knockout="false" quality="2" strength="1"/>
-			</s:filters>
-		</s:RichText>
-		<s:BitmapImage d:userLabel="g-fondoregistro"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					   x="83" y="317" smooth="true"
-					   source="@Embed('/assets/images/rana-v2/Forma 1 copia 2.png')"
-					   x.FinJuego="83" y.FinJuego="353"/>
-		<s:RichText id="lbl_nom_record" d:userLabel="g-letra"
-					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					x="106" y="380" color="#363636" fontFamily="Counter-Strike" fontSize="65.101"
-					fontWeight="bold" kerning="off" lineHeight="154.1%" textAlign="left"
-					whiteSpaceCollapse="preserve"
-					x.FinJuego="110" y.FinJuego="417" width.FinJuego="709" text.FinJuego="a">
-			<s:filters>
-				<s:DropShadowFilter includeIn="FinJuego" alpha="0.5" angle="45.0" blurX="4.0"
-									blurY="4.0" color="0x000000" distance="4.0" hideObject="false"
-									inner="true" knockout="false" quality="2" strength="1"/>
-			</s:filters>
-			<s:content.TipoDeJuego><s:p><s:span>a</s:span></s:p></s:content.TipoDeJuego>
-			<s:content.Jugadores><s:p><s:span>a</s:span></s:p></s:content.Jugadores>
-			<s:content.Principal><s:p><s:span>a</s:span></s:p></s:content.Principal>
-			<s:content.Blanqueado><s:p><s:span>a</s:span></s:p></s:content.Blanqueado>
-			<s:content.Comenzar><s:p><s:span>a</s:span></s:p></s:content.Comenzar>
-			<s:content.Puntajes><s:p><s:span>a</s:span></s:p></s:content.Puntajes>
-		</s:RichText>
-		<s:RichText id="richtext14" d:userLabel="g-registratupuntaje"
-					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					x="107" y="348" color="#ffffff" fontFamily="Counter-Strike" fontSize="30"
-					fontWeight="bold" kerning="off" lineHeight="652.7%"
-					whiteSpaceCollapse="preserve"
-					x.FinJuego="109" y.FinJuego="385" color.FinJuego="#FFFFFF"
-					text.FinJuego="REGISTRA TU PUNTAJE">
-			<s:content.TipoDeJuego><s:p><s:span>REGISTRA TU PUNTAJE</s:span></s:p></s:content.TipoDeJuego>
-			<s:content.Principal><s:p><s:span>REGISTRA TU PUNTAJE</s:span></s:p></s:content.Principal>
-			<s:content.Comenzar><s:p><s:span>REGISTRA TU PUNTAJE</s:span></s:p></s:content.Comenzar>
-			<s:content.Blanqueado><s:p><s:span>REGISTRA TU PUNTAJE</s:span></s:p></s:content.Blanqueado>
-			<s:content.Jugadores><s:p><s:span>REGISTRA TU PUNTAJE</s:span></s:p></s:content.Jugadores>
-			<s:content.Puntajes><s:p><s:span>REGISTRA TU PUNTAJE</s:span></s:p></s:content.Puntajes>
-		</s:RichText>
-		<s:BitmapImage id="bitmapimage23" d:userLabel="g-linea1"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
-					   x="105" y="417" smooth="true"
-					   source="@Embed('/assets/images/rana-v2/Forma 8.png')"
-					   x.FinJuego="109" y.FinJuego="454">
-			<s:mask>
-				<s:Group x="0" y="0">
-					<s:Path data="M 0.7 2.2 L 0.7 0.2 L 43.2 0.2 L 43.2 2.2 L 0.7 2.2"
-							winding="evenOdd">
-						<s:fill>
-							<s:SolidColor color="#ff0000"/>
-						</s:fill>
-					</s:Path>
-				</s:Group>
-			</s:mask>
-		</s:BitmapImage>
-		<s:BitmapImage id="bitmapimage11" d:userLabel="g-linea2" includeIn="FinJuego" x="157" y="454"
-					   smooth="true" source="@Embed('/assets/images/rana-v2/Forma 8.png')">
-			<s:mask>
-				<s:Group x="0" y="0">
-					<s:Path data="M 0.7 2.2 L 0.7 0.2 L 43.2 0.2 L 43.2 2.2 L 0.7 2.2"
-							winding="evenOdd">
-						<s:fill>
-							<s:SolidColor color="#ff0000"/>
-						</s:fill>
-					</s:Path>
-				</s:Group>
-			</s:mask>
-		</s:BitmapImage>
-		<s:BitmapImage id="bitmapimage0" d:userLabel="g-linea3" includeIn="FinJuego" x="205" y="454"
-					   smooth="true" source="@Embed('/assets/images/rana-v2/Forma 8.png')">
-			<s:mask>
-				<s:Group x="0" y="0">
-					<s:Path data="M 0.7 2.2 L 0.7 0.2 L 43.2 0.2 L 43.2 2.2 L 0.7 2.2"
-							winding="evenOdd">
-						<s:fill>
-							<s:SolidColor color="#ff0000"/>
-						</s:fill>
-					</s:Path>
-				</s:Group>
-			</s:mask>
-		</s:BitmapImage>
-		<s:BitmapImage id="bitmapimage1" d:userLabel="g-linea4" includeIn="FinJuego" x="253" y="454"
-					   smooth="true" source="@Embed('/assets/images/rana-v2/Forma 8.png')">
-			<s:mask>
-				<s:Group x="0" y="0">
-					<s:Path data="M 0.7 2.2 L 0.7 0.2 L 43.2 0.2 L 43.2 2.2 L 0.7 2.2"
-							winding="evenOdd">
-						<s:fill>
-							<s:SolidColor color="#ff0000"/>
-						</s:fill>
-					</s:Path>
-				</s:Group>
-			</s:mask>
-		</s:BitmapImage>
-		<s:BitmapImage id="bitmapimage12" d:userLabel="g-linea5" includeIn="FinJuego" x="301" y="454"
-					   smooth="true" source="@Embed('/assets/images/rana-v2/Forma 8.png')">
-			<s:mask>
-				<s:Group x="0" y="0">
-					<s:Path data="M 0.7 2.2 L 0.7 0.2 L 43.2 0.2 L 43.2 2.2 L 0.7 2.2"
-							winding="evenOdd">
-						<s:fill>
-							<s:SolidColor color="#ff0000"/>
-						</s:fill>
-					</s:Path>
-				</s:Group>
-			</s:mask>
-		</s:BitmapImage>
-		<s:BitmapImage id="bitmapimage13" d:userLabel="g-linea6" includeIn="FinJuego" x="349" y="454"
-					   smooth="true" source="@Embed('/assets/images/rana-v2/Forma 8.png')">
-			<s:mask>
-				<s:Group x="0" y="0">
-					<s:Path data="M 0.7 2.2 L 0.7 0.2 L 43.2 0.2 L 43.2 2.2 L 0.7 2.2"
-							winding="evenOdd">
-						<s:fill>
-							<s:SolidColor color="#ff0000"/>
-						</s:fill>
-					</s:Path>
-				</s:Group>
-			</s:mask>
-		</s:BitmapImage>
-		<s:BitmapImage id="bitmapimage14" d:userLabel="g-linea7" includeIn="FinJuego" x="397" y="454"
-					   smooth="true" source="@Embed('/assets/images/rana-v2/Forma 8.png')">
-			<s:mask>
-				<s:Group x="0" y="0">
-					<s:Path data="M 0.7 2.2 L 0.7 0.2 L 43.2 0.2 L 43.2 2.2 L 0.7 2.2"
-							winding="evenOdd">
-						<s:fill>
-							<s:SolidColor color="#ff0000"/>
-						</s:fill>
-					</s:Path>
-				</s:Group>
-			</s:mask>
-		</s:BitmapImage>
-		<s:BitmapImage id="bitmapimage15" d:userLabel="g-linea8" includeIn="FinJuego" x="445" y="454"
-					   smooth="true" source="@Embed('/assets/images/rana-v2/Forma 8.png')">
-			<s:mask>
-				<s:Group x="0" y="0">
-					<s:Path data="M 0.7 2.2 L 0.7 0.2 L 43.2 0.2 L 43.2 2.2 L 0.7 2.2"
-							winding="evenOdd">
-						<s:fill>
-							<s:SolidColor color="#ff0000"/>
-						</s:fill>
-					</s:Path>
-				</s:Group>
-			</s:mask>
-		</s:BitmapImage>
-		<s:BitmapImage id="bitmapimage16" d:userLabel="g-linea9" includeIn="FinJuego" x="493" y="454"
-					   smooth="true" source="@Embed('/assets/images/rana-v2/Forma 8.png')">
-			<s:mask>
-				<s:Group x="0" y="0">
-					<s:Path data="M 0.7 2.2 L 0.7 0.2 L 43.2 0.2 L 43.2 2.2 L 0.7 2.2"
-							winding="evenOdd">
-						<s:fill>
-							<s:SolidColor color="#ff0000"/>
-						</s:fill>
-					</s:Path>
-				</s:Group>
-			</s:mask>
-		</s:BitmapImage>
-		<s:BitmapImage id="bitmapimage17" d:userLabel="g-linea10" includeIn="FinJuego" x="541"
-					   y="454" smooth="true" source="@Embed('/assets/images/rana-v2/Forma 8.png')">
-			<s:mask>
-				<s:Group x="0" y="0">
-					<s:Path data="M 0.7 2.2 L 0.7 0.2 L 43.2 0.2 L 43.2 2.2 L 0.7 2.2"
-							winding="evenOdd">
-						<s:fill>
-							<s:SolidColor color="#ff0000"/>
-						</s:fill>
-					</s:Path>
-				</s:Group>
-			</s:mask>
-		</s:BitmapImage>
-		<s:BitmapImage id="bitmapimage18" d:userLabel="g-linea11" includeIn="FinJuego" x="589"
-					   y="454" smooth="true" source="@Embed('/assets/images/rana-v2/Forma 8.png')">
-			<s:mask>
-				<s:Group x="0" y="0">
-					<s:Path data="M 0.7 2.2 L 0.7 0.2 L 43.2 0.2 L 43.2 2.2 L 0.7 2.2"
-							winding="evenOdd">
-						<s:fill>
-							<s:SolidColor color="#ff0000"/>
-						</s:fill>
-					</s:Path>
-				</s:Group>
-			</s:mask>
-		</s:BitmapImage>
-		<s:BitmapImage id="bitmapimage19" d:userLabel="g-linea12" includeIn="FinJuego" x="637"
-					   y="454" smooth="true" source="@Embed('/assets/images/rana-v2/Forma 8.png')">
-			<s:mask>
-				<s:Group x="0" y="0">
-					<s:Path data="M 0.7 2.2 L 0.7 0.2 L 43.2 0.2 L 43.2 2.2 L 0.7 2.2"
-							winding="evenOdd">
-						<s:fill>
-							<s:SolidColor color="#ff0000"/>
-						</s:fill>
-					</s:Path>
-				</s:Group>
-			</s:mask>
-		</s:BitmapImage>
-		<s:BitmapImage id="bitmapimage20" d:userLabel="g-linea13" includeIn="FinJuego" x="685"
-					   y="454" smooth="true" source="@Embed('/assets/images/rana-v2/Forma 8.png')">
-			<s:mask>
-				<s:Group x="0" y="0">
-					<s:Path data="M 0.7 2.2 L 0.7 0.2 L 43.2 0.2 L 43.2 2.2 L 0.7 2.2"
-							winding="evenOdd">
-						<s:fill>
-							<s:SolidColor color="#ff0000"/>
-						</s:fill>
-					</s:Path>
-				</s:Group>
-			</s:mask>
-		</s:BitmapImage>
-		<s:BitmapImage id="bitmapimage21" d:userLabel="g-linea14" includeIn="FinJuego" x="733"
-					   y="454" smooth="true" source="@Embed('/assets/images/rana-v2/Forma 8.png')">
-			<s:mask>
-				<s:Group x="0" y="0">
-					<s:Path data="M 0.7 2.2 L 0.7 0.2 L 43.2 0.2 L 43.2 2.2 L 0.7 2.2"
-							winding="evenOdd">
-						<s:fill>
-							<s:SolidColor color="#ff0000"/>
-						</s:fill>
-					</s:Path>
-				</s:Group>
-			</s:mask>
-		</s:BitmapImage>
-		<s:BitmapImage id="bitmapimage22" d:userLabel="g-linea15" includeIn="FinJuego" x="781"
-					   y="454" smooth="true" source="@Embed('/assets/images/rana-v2/Forma 8.png')">
-			<s:mask>
-				<s:Group x="0" y="0">
-					<s:Path data="M 0.7 2.2 L 0.7 0.2 L 43.2 0.2 L 43.2 2.2 L 0.7 2.2"
-							winding="evenOdd">
-						<s:fill>
-							<s:SolidColor color="#ff0000"/>
-						</s:fill>
-					</s:Path>
-				</s:Group>
-			</s:mask>
-		</s:BitmapImage>
+		
 	</fx:DesignLayer>
 	<s:VideoDisplay id="videoIntro" includeIn="Video" left="0" right="0" top="0" bottom="0"
 					complete="finVideo()" source="assets/video/rana.mp4"/>
@@ -1354,6 +998,17 @@
 							label="Equipos de 2"/>
 	<components:BotonPuntos id="btnEquipo3" includeIn="Grupos" x="234" y="442" height="66"
 							label="Equipos de 3"/>
+	<s:Label includeIn="FinJuego" x="253" y="86" text="Fin del Chico" verticalAlign="middle">
+		<s:filters>
+			<s:GlowFilter blurX="12" blurY="12" color="#48b0f7" quality="{BitmapFilterQuality.HIGH}"
+						  strength="3"/>
+		</s:filters>
+	</s:Label>
+	<s:Label includeIn="FinJuego" x="202" y="530" color="#FFFFFF" text="Continuar?"/>
+	<components:BotonPuntos id="btnNuevoChico" includeIn="FinJuego" x="317" y="596" width="170"
+							height="82" label="SI"/>
+	<components:BotonPuntos id="btnNuevoChico0" includeIn="FinJuego" x="555" y="596" width="170"
+							height="82" label="NO"/>
 		
 	<s:transitions>
 		<s:Transition autoReverse="true" fromState="TipoDeJuego" toState="Puntajes">
@@ -1489,80 +1144,6 @@
 				</s:Parallel>
 				<s:Parallel target="{bitmapimage7}">
 					<s:Fade duration="0" d:innerChildFade="begin" startDelay="0"/>
-				</s:Parallel>
-			</s:Parallel>
-		</s:Transition>
-		<s:Transition autoReverse="true" fromState="FinJuego" toState="Comenzar">
-			<s:Parallel>
-				<s:Parallel target="{bitmapimage6}">
-					<s:Move autoCenterTransform="true" duration="0"/>
-				</s:Parallel>
-				<s:Parallel target="{bitmapimage2}">
-					<s:Move autoCenterTransform="true" duration="1000"/>
-				</s:Parallel>
-				<s:Parallel target="{bitmapimage23}">
-					<s:Move autoCenterTransform="true" duration="0"/>
-				</s:Parallel>
-				<s:Parallel target="{designlayer21}">
-					<s:Fade duration="500" startDelay="0"/>
-				</s:Parallel>
-
-				<s:Parallel target="{designlayer1}">
-					<s:Fade duration="0"/>
-				</s:Parallel>
-				<s:Parallel target="{bitmapimage7}">
-					<s:Fade duration="0" d:innerChildFade="begin" startDelay="0"/>
-				</s:Parallel>
-				<s:Parallel target="{lbl_tipo_juego_princ}">
-					<s:Move autoCenterTransform="true" duration="0"/>
-				</s:Parallel>
-				<s:Parallel target="{bitmapimage11}">
-					<s:Fade duration="0" d:innerChildFade="end" startDelay="0"/>
-				</s:Parallel>
-				<s:Parallel target="{bitmapimage0}">
-					<s:Fade duration="0" d:innerChildFade="end" startDelay="0"/>
-				</s:Parallel>
-				<s:Parallel target="{bitmapimage1}">
-					<s:Fade duration="0" d:innerChildFade="end" startDelay="0"/>
-				</s:Parallel>
-				<s:Parallel target="{bitmapimage12}">
-					<s:Fade duration="0" d:innerChildFade="end" startDelay="0"/>
-				</s:Parallel>
-				<s:Parallel target="{bitmapimage13}">
-					<s:Fade duration="0" d:innerChildFade="end" startDelay="0"/>
-				</s:Parallel>
-				<s:Parallel target="{bitmapimage14}">
-					<s:Fade duration="0" d:innerChildFade="end" startDelay="0"/>
-				</s:Parallel>
-				<s:Parallel target="{bitmapimage15}">
-					<s:Fade duration="0" d:innerChildFade="end" startDelay="0"/>
-				</s:Parallel>
-				<s:Parallel target="{bitmapimage16}">
-					<s:Fade duration="0" d:innerChildFade="end" startDelay="0"/>
-				</s:Parallel>
-				<s:Parallel target="{bitmapimage17}">
-					<s:Fade duration="0" d:innerChildFade="end" startDelay="0"/>
-				</s:Parallel>
-				<s:Parallel target="{bitmapimage18}">
-					<s:Fade duration="0" d:innerChildFade="end" startDelay="0"/>
-				</s:Parallel>
-				<s:Parallel target="{bitmapimage19}">
-					<s:Fade duration="0" d:innerChildFade="end" startDelay="0"/>
-				</s:Parallel>
-				<s:Parallel target="{bitmapimage20}">
-					<s:Fade duration="0" d:innerChildFade="end" startDelay="0"/>
-				</s:Parallel>
-				<s:Parallel target="{bitmapimage21}">
-					<s:Fade duration="0" d:innerChildFade="end" startDelay="0"/>
-				</s:Parallel>
-				<s:Parallel target="{bitmapimage22}">
-					<s:Fade duration="0" d:innerChildFade="end" startDelay="0"/>
-				</s:Parallel>
-				<s:Parallel target="{lbl_nom_record}">
-					<s:Move autoCenterTransform="true" duration="0"/>
-				</s:Parallel>
-				<s:Parallel target="{richtext14}">
-					<s:Move autoCenterTransform="true" duration="0"/>
 				</s:Parallel>
 			</s:Parallel>
 		</s:Transition>

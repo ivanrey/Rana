@@ -95,7 +95,7 @@
 		<components:ComponentePuntaje id="comp_puntaje" d:userLabel="ts-progressbar" x="97" y="44">
 		</components:ComponentePuntaje>
 		<s:List id="lst_blanqueados" d:userLabel="ta-jugadorblanqueadas"
-				skinClass="components.blanqueadas"
+				skinClass="components.Blanqueadas"
 				x.activado="98" y.activado="85"
 				x.desactivado="97" y.desactivado="86">
 			<s:ArrayCollection>
