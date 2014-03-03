@@ -5,7 +5,7 @@
 					   xmlns:components="components.*"
 					   width="1280" height="768" addedToStage="inicializarKeyListeners()"
 					   backgroundColor="#FFFFFF" creationComplete="inicializar()"
-					   currentState="Comenzar" preloaderChromeColor="#FFFFFF" showStatusBar="false">
+					   currentState="Comenzar" preloaderChromeColor="#FFFFFF" showStatusBar="false" xmlns:util="util.*">
 	<fx:Style source="Rana.css"/>
 	<fx:Script><![CDATA[
 		import flash.filters.BitmapFilterQuality;
@@ -23,6 +23,7 @@
 		
 		import util.Puntaje;
 		
+		[Bindable]
 		private var fachada:FachadaRana;
 		private var arrayJugadoresGraf:Array = new Array();
 		private var jugadores:Array = new Array();
@@ -103,6 +104,9 @@
 		 * El jugador activo podria ser el ganador si nadie ha ganado (por ejemplo porque se blanquearon)
 		 */ 
 		public function finChico(event:RanaEvento):void{
+			//aca se podria hacer logica.
+			for(var i:int=0;i<6;i++)
+				this.arrayJugadoresGraf[i].enabled = false;
 			
 		}
 		
@@ -225,7 +229,6 @@
 				var jugadores:int = this.fachada.agregarCredito();
 				for(var i:int=0;i<jugadores && i<6;i++)
 					this.arrayJugadoresGraf[i].enabled = true;
-				this.lbl_texto_credito.text = this.fachada.consultarCredito() +(this.fachada.consultarCredito()==1?' Crédito':' Créditos');
 			}
 		}
 		
@@ -236,7 +239,7 @@
 			if(estado == 'Comenzar' || estado == 'Video' || estado == 'Puntajes'){
 				if(key == Keyboard.ENTER){
 					this.timerLoop.stop();
-					this.currentState = 'TipoDeJuego';
+					this.currentState = 'Grupos';
 				}
 			}
 			
@@ -257,7 +260,7 @@
 					
 				}else if(key == Keyboard.ENTER){
 					if(this.fachada.getPuntajeMaximo() != -1){
-						this.currentState = 'Grupos';
+						this.currentState = 'Jugadores';
 						this.configuracionActiva = -1;
 					}
 				}
@@ -293,12 +296,11 @@
 					if(this.configuracionActiva == -1) this.configuracionActiva = 0;
 					
 				}else if(key == Keyboard.ENTER){
-					if(this.fachada.getPuntajeMaximo() != -1){
-						this.currentState = 'Jugadores';
-						this.lbl_texto_credito.text = this.fachada.consultarCredito()+' Créditos';
+						this.currentState = 'TipoDeJuego';
 						for(var i:int = 0; i<this.arrayJugadoresGraf.length-1 ;i++)
 							this.arrayJugadoresGraf[i].enabled = false;
-					}
+					
+						this.configuracionActiva = -1;
 				}
 				
 				if(cambio2 != 0 ){
@@ -330,7 +332,20 @@
 			}
 			
 			if(estado == "FinJuego"){
-				
+				if(key == Keyboard.DOWN){
+					this.btnNuevoChico.skin.setCurrentState('up');	
+					this.btnFinDelJuego.skin.setCurrentState('down');
+				}else if(key == Keyboard.UP){
+					this.btnNuevoChico.skin.setCurrentState('down');
+					this.btnFinDelJuego.skin.setCurrentState('up');
+				}else if(key == Keyboard.ENTER){
+					if(this.btnNuevoChico.skin.currentState == 'down')
+						this.currentState = 'TipoDeJuego';
+					else if(this.btnFinDelJuego.skin.currentState == 'down'){
+						this.fachada.nuevoJuego();
+						this.currentState = 'Comenzar';
+					}
+				}
 			}
 			
 			if(estado == 'Principal'){
@@ -374,8 +389,9 @@
 				else if(key == Keyboard.PAGE_DOWN)
 					this.fachada.cambiarTurno(6);
 				
-				if(estado == 'Ganaste')
-					this.currentState = 'Principal';
+				if(estado == 'Ganaste'){
+					this.currentState = fachada.terminado?'FinJuego':'Principal';
+				}
 			}
 		}
 		
@@ -591,7 +607,7 @@
 					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
 					x="605" y="503" color="#d56e00" fontFamily="Counter-Strike" fontSize="93.48"
 					fontWeight="bold" kerning="off" lineHeight="652.7%" textAlign="right"
-					whiteSpaceCollapse="preserve"
+					whiteSpaceCollapse="preserve" text="{fachada.credito} Crédito{fachada.credito>1?'s':''}"
 					x.Jugadores="601" y.Jugadores="490">
 			<s:filters>
 				<s:DropShadowFilter includeIn="Jugadores" alpha="1" angle="45.0" blurX="6" blurY="6"
@@ -784,18 +800,7 @@
 		<fx:DesignLayer d:userLabel="Turno actual">
 			<s:List id="lst_puntajes_turnos" d:userLabel="ta-datalistturnos" includeIn="Principal"
 				 x="319" y="472" skinClass="components.UltimosPuntajes">
-				<s:ArrayCollection>
-					<fx:Object image1="@Embed('/assets/images/rana-v2/Forma 7.png')" text1="3"
-							   text2="tiro" text3="puntos" text4="900"/>
-					<fx:Object image1="@Embed('/assets/images/rana-v2/Forma 7.png')" text1="2"
-							   text2="tiro" text3="puntos" text4=" -10"/>
-					<fx:Object image1="@Embed('/assets/images/rana-v2/Forma 7.png')" text1="3"
-							   text2="tiro" text3="puntos" text4="10"/>
-					<fx:Object image1="@Embed('/assets/images/rana-v2/Forma 7.png')" text1="2"
-							   text2="tiro" text3="puntos" text4="-10"/>
-					<fx:Object image1="@Embed('/assets/images/rana-v2/Forma 7.png')" text1="1"
-							   text2="tiro" text3="puntos" text4="-10"/>
-				</s:ArrayCollection>
+				
 			</s:List>
 			<s:BitmapImage d:userLabel="ta-div1"
 						   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
@@ -998,17 +1003,27 @@
 							label="Equipos de 2"/>
 	<components:BotonPuntos id="btnEquipo3" includeIn="Grupos" x="234" y="442" height="66"
 							label="Equipos de 3"/>
-	<s:Label includeIn="FinJuego" x="253" y="86" text="Fin del Chico" verticalAlign="middle">
+	<s:Label includeIn="FinJuego" x="101" y="54" text="Fin del Chico #{fachada.numChico}" verticalAlign="middle">
 		<s:filters>
 			<s:GlowFilter blurX="12" blurY="12" color="#48b0f7" quality="{BitmapFilterQuality.HIGH}"
 						  strength="3"/>
 		</s:filters>
 	</s:Label>
-	<s:Label includeIn="FinJuego" x="202" y="530" color="#FFFFFF" text="Continuar?"/>
-	<components:BotonPuntos id="btnNuevoChico" includeIn="FinJuego" x="317" y="596" width="170"
+	<s:Label includeIn="FinJuego" x="39" y="586" color="#FFFFFF" text="Continuar?"/>
+	<components:BotonPuntos id="btnNuevoChico" includeIn="FinJuego" x="789" y="581" width="170"
 							height="82" label="SI"/>
-	<components:BotonPuntos id="btnNuevoChico0" includeIn="FinJuego" x="555" y="596" width="170"
+	<components:BotonPuntos id="btnFinDelJuego" includeIn="FinJuego" x="789" y="671" width="170"
 							height="82" label="NO"/>
+	<s:List includeIn="FinJuego" x="93" y="199" width="784" height="361" borderAlpha="0"
+			contentBackgroundAlpha="0.0" dataProvider="{fachada.puestos}"
+			itemRenderer="components.PuestoJugador"></s:List>
+	<s:Label includeIn="FinJuego" x="176" y="135" color="#D06905" fontSize="80"
+			 text="chicos perdidos">
+		<s:filters>
+			<s:GlowFilter blurX="12" blurY="12" color="#48b0f7" quality="{BitmapFilterQuality.HIGH}"
+						  strength="3"/>
+		</s:filters>
+	</s:Label>
 		
 	<s:transitions>
 		<s:Transition autoReverse="true" fromState="TipoDeJuego" toState="Puntajes">

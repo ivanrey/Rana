@@ -29,9 +29,10 @@ package model {
 			this.addEventListener(RanaEvento.GANADOR,nuevoGanador);
 		}
 		
-		public function nuevoGanador(evento:RanaEvento, datos:Array):void{
+		public function nuevoGanador(evento:RanaEvento):void{
+			var datos:Array = evento.params;
 			//datos es> puntaje, this.puntajeTurno, orificio, this.puntajeMaximo, jugador
-			this.puestos.push(datos[4]);
+			this.puestos.push(datos[4].getNumero());
 			//Reviso si no se ha terminado el juego
 			var jugadoresActivos:int = 0;
 			for each (var jugador:Jugador in jugadores){

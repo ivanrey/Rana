@@ -4,7 +4,6 @@
 		  xmlns:mx="library://ns.adobe.com/flex/mx"
 		  width="528" height="123" chromeColor="#FFFFFF" enabled="true" skinClass="BotonPuntosSkin" label="Button" >
 	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	
 </s:Button>

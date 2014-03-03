@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="688" height="56">
+	<fx:Declarations>
+	</fx:Declarations>
+	<s:Label x="10" y="20" fontSize="50" text="Jugador {data.numJugador}"/>
+	<s:Label x="560" y="10" color="#F99403" fontSize="80" text="{data.chicosPerdidos}"/>
+</s:ItemRenderer>

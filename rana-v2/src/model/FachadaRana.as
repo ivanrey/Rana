@@ -3,23 +3,38 @@ package model {
 	import flash.media.Sound;
 	import flash.net.URLRequest;
 	
+	import mx.collections.ArrayCollection;
+	
 	import util.RanaException;
 
 	public class FachadaRana extends EventDispatcher{
 		
-		public var estado:int;
 		public var puntajeMaximo:int;
-		private var credito:int;
+		private var _credito:int;
 		private var conf:Configuracion;
 		private var recordsVar:Records;
 		private var chico:ChicoRana;
 		private var participantesPorJugador:int;
+		private var _terminado:Boolean = false;
+		
+		
+		[Bindable]
+		public var numChico:int;
+		
+		[Bindable]
+		public var puestos:ArrayCollection;
 		
 		public function FachadaRana():void{
 			this.conf = new Configuracion();
 			this.conf.loadConfiguracion();
 			this.puntajeMaximo = -1;
 			this.recordsVar = new Records(this.conf);
+			this.numChico = 0;
+			this.puestos = new ArrayCollection();
+		}
+		
+		public function get terminado():Boolean{
+			return _terminado;
 		}
 		
 		/**
@@ -40,9 +55,15 @@ package model {
 			sonidoMoneda.play();
 		}
 		
-		public function consultarCredito():int {
-			return this.credito;
+		[Bindable]
+		public function get credito():int {
+			return this._credito;
 		}
+	
+		private function set credito(value:int):void{
+			this._credito = value;
+		}
+		
 		public function consultarTurno():int{
 			return this.chico.getTurno();
 		}
@@ -50,7 +71,7 @@ package model {
 			return this.conf.getMaxBlanqueadas();
 		}
 		public function getCantidadJugadoresCredito():int{
-			var monedasPorPersona:int = this.puntajeMaximo > 1200 ? this.credito/2: this.credito; // por ahora un credito por jugador sin importar el puntaje
+			var monedasPorPersona:int = this.puntajeMaximo > 1200 ? this._credito/2: this._credito; // por ahora un credito por jugador sin importar el puntaje
 			return Math.floor(monedasPorPersona/this.participantesPorJugador);
 		}
 		
@@ -64,6 +85,7 @@ package model {
 		
 		public function iniciarChico():void {
 			var numJugadores:int = this.getCantidadJugadoresCredito();
+			this.numChico++;
 			this.chico = new ChicoRana(this.conf);
 			this.chico.setPuntajeMaximo(this.puntajeMaximo);
 			this.chico.setNumJugadores(numJugadores);
@@ -73,8 +95,11 @@ package model {
 			this.addListeners();
 			
 			// Descuento el credito usado
-			var valor:int = this.puntajeMaximo > 1200 ? 1 : 2;
-			this.credito = this.credito - (numJugadores*valor);
+			var valor:int = this.puntajeMaximo > 1200 ? 2 : 1;
+			this.credito = this._credito - (numJugadores*valor);
+			
+			if(this._credito	<0)
+				throw new RanaException("El credito no es suficiente para la cantidad de jugadores");
 			
 			this.sonar("inicio");
 		}
@@ -137,8 +162,27 @@ package model {
 		 * Se ha terminado el chico, ahora debemos revisar quien gano y quien perdio
 		 */ 
 		private function finDelChico():void{
-			var ganadores = this.chico.getPuestos();
-			
+			var ganadores:Array = this.chico.getPuestos();
+			//Los que no hayan ganado, le sumamos uno al puesto.
+			for(var i:int=0; i < this.chico.getNumJugadores(); i++){
+				//este jugador no gano
+				try{
+					puestos.getItemAt(i);
+				}catch( e:RangeError){
+					puestos.addItemAt(new PuestoJuego(i+1),i);
+				}
+					
+				if(ganadores.indexOf(i+1)==-1){
+					puestos[i].chicosPerdidos++;
+				}
+			}
+			_terminado = true;
+		}
+		
+		public function nuevoJuego():void{
+			puestos = new ArrayCollection();
+			_terminado = false;
+			numChico = 0;
 		}
 		
 		private function addListeners():void{
