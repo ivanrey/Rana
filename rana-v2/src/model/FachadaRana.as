@@ -70,9 +70,14 @@ package model {
 		public function getMaximoBlanqueadas():int{
 			return this.conf.getMaxBlanqueadas();
 		}
+		
+		private function getMonedasPorPersona():int{
+			return this.puntajeMaximo > 1200 ? this._credito/2: this._credito; // por ahora un credito por jugador sin importar el puntaje
+				
+		}
+		
 		public function getCantidadJugadoresCredito():int{
-			var monedasPorPersona:int = this.puntajeMaximo > 1200 ? this._credito/2: this._credito; // por ahora un credito por jugador sin importar el puntaje
-			return Math.floor(monedasPorPersona/this.participantesPorJugador);
+			return Math.floor(this.getMonedasPorPersona()/this.participantesPorJugador);
 		}
 		
 		public function setTipoJuego(tipo:int):void{
@@ -95,10 +100,10 @@ package model {
 			this.addListeners();
 			
 			// Descuento el credito usado
-			var valor:int = this.puntajeMaximo > 1200 ? 2 : 1;
-			this.credito = this._credito - (numJugadores*valor);
+			var creditosUsados:int = this.getMonedasPorPersona()*this.getCantidadJugadoresCredito()
+			this.credito = this._credito - creditosUsados;
 			
-			if(this._credito	<0)
+			if(this._credito <0)
 				throw new RanaException("El credito no es suficiente para la cantidad de jugadores");
 			
 			this.sonar("inicio");
