@@ -4,6 +4,7 @@ package model {
 	import flash.net.URLRequest;
 	
 	import mx.collections.ArrayCollection;
+	import mx.utils.ArrayUtil;
 	
 	import util.RanaException;
 
@@ -35,6 +36,11 @@ package model {
 		
 		public function get terminado():Boolean{
 			return _terminado;
+		}
+		
+		
+		public function getSiguienteTurno():int{
+			return this.chico.getSiguienteTurno();
 		}
 		
 		/**
@@ -71,13 +77,13 @@ package model {
 			return this.conf.getMaxBlanqueadas();
 		}
 		
-		private function getMonedasPorPersona():int{
-			return this.puntajeMaximo > 1200 ? this._credito/2: this._credito; // por ahora un credito por jugador sin importar el puntaje
+		private function getMonedasPorPersona():Number{
+			return this.puntajeMaximo > 1200 ? 2:1; // por ahora un credito por jugador sin importar el puntaje
 				
 		}
 		
 		public function getCantidadJugadoresCredito():int{
-			return Math.floor(this.getMonedasPorPersona()/this.participantesPorJugador);
+			return Math.floor(this._credito/(this.getMonedasPorPersona()*this.participantesPorJugador));
 		}
 		
 		public function setTipoJuego(tipo:int):void{
@@ -89,6 +95,8 @@ package model {
 		}
 		
 		public function iniciarChico():void {
+			
+			this._terminado = false;
 			var numJugadores:int = this.getCantidadJugadoresCredito();
 			this.numChico++;
 			this.chico = new ChicoRana(this.conf);
@@ -100,7 +108,7 @@ package model {
 			this.addListeners();
 			
 			// Descuento el credito usado
-			var creditosUsados:int = this.getMonedasPorPersona()*this.getCantidadJugadoresCredito()
+			var creditosUsados:int = this.getMonedasPorPersona()*this.participantesPorJugador*this.getCantidadJugadoresCredito()
 			this.credito = this._credito - creditosUsados;
 			
 			if(this._credito <0)
@@ -113,7 +121,11 @@ package model {
 			this.chico.registrarLanzamiento(orificio);
 		}
 		public function cambiarTurno(nuevoTurno:int):void{
-			this.chico.cambiarTurno(nuevoTurno);
+			try{
+				this.chico.cambiarTurno(nuevoTurno);
+			}catch(e:RanaException){
+				trace (e.message);
+			}
 		}
 		private function getJugadorActual():Jugador {
 			return this.chico.getJugadorEnTurno();
@@ -167,6 +179,8 @@ package model {
 		 * Se ha terminado el chico, ahora debemos revisar quien gano y quien perdio
 		 */ 
 		private function finDelChico():void{
+			this.puntajeMaximo = -1;
+			
 			var ganadores:Array = this.chico.getPuestos();
 			//Los que no hayan ganado, le sumamos uno al puesto.
 			for(var i:int=0; i < this.chico.getNumJugadores(); i++){
@@ -181,13 +195,14 @@ package model {
 					puestos[i].chicosPerdidos++;
 				}
 			}
+			
+			
 			_terminado = true;
 		}
 		
 		public function nuevoJuego():void{
-			puestos = new ArrayCollection();
-			_terminado = false;
 			numChico = 0;
+			this.puestos = new ArrayCollection(); 
 		}
 		
 		private function addListeners():void{
@@ -201,8 +216,6 @@ package model {
 		}
 		
 		private function fireEvent(event:RanaEvento):void{
-			if(event.type == RanaEvento.RANA_TERMINAR_JUEGO)
-				this.puntajeMaximo = -1;
 			dispatchEvent(new RanaEvento(event.type,event.params));
 			
 			switch(event.type){
@@ -219,7 +232,7 @@ package model {
 					this.sonar("jugadoreliminado");
 					break;
 				case RanaEvento.RANA_TERMINAR_JUEGO:
-					this.sonar("blanqueado");
+					this.sonar("ganador");
 					this.finDelChico();
 					break;
 				case RanaEvento.GANADOR:

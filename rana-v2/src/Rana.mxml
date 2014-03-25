@@ -18,6 +18,7 @@
 		import mx.controls.Alert;
 		import mx.controls.VideoDisplay;
 		import mx.core.UIComponent;
+		import mx.managers.CursorManager;
 		
 		import spark.components.VideoPlayer;
 		
@@ -41,6 +42,9 @@
 		private var configuracionActiva:int=-1;
 		
 		public function inicializarKeyListeners():void{
+			
+			//Mouse.hide();
+			
 			this.arrayJugadoresGraf[0] = this.button0;
 			this.arrayJugadoresGraf[1] = this.button1;
 			this.arrayJugadoresGraf[2] = this.button2;
@@ -123,6 +127,10 @@
 		}
 		
 		public function cambiarTurno(event:RanaEvento):void{
+			if(currentState == 'Ganaste'){
+				this.currentState = fachada.terminado?'FinJuego':'Principal';
+			}
+			
 			var nuevoTurno:int = event.params;
 			for each(var jugador:JugadorCustomComponent in this.jugadores)
 				jugador.desactivarTurno();
@@ -130,6 +138,8 @@
 			this.limpiarMonedas();
 			this.limpiarTurnoPuntaje(nuevoTurno);
 			this.refrescarUltimosLanzamientos();
+			
+			
 		}
 		
 		public function blanquearJugador(event:RanaEvento):void{
@@ -195,7 +205,7 @@
 			this.lbl_tipo_juego_princ.text = this.fachada.getPuntajeMaximo() + ' Puntos';
 			
 			this.limpiarMonedas()
-			this.jugadores[0].activarEnTurno();
+			this.cambiarTurno(new RanaEvento(RanaEvento.RANA_TURNO_CAMBIADO,1));
 			
 		}
 		
@@ -232,6 +242,12 @@
 			}
 		}
 		
+		public function limpiarBotonesTipoDeJuego():void{
+			var botones:Array = [this.btnCuatrocientos, this.btnOchocientos, this.btnMildoscientos, this.btnMilseiscientos, this.btnMilochocientos, this.btnDosmil];
+			for each( var boton:BotonPuntos in botones)
+				boton.skin.setCurrentState('up');
+		}
+		
 		public function keyboard(event:KeyboardEvent):void{
 			var key:uint= event.keyCode;
 			var estado:String = this.currentState;
@@ -251,6 +267,7 @@
 				
 				if(key == Keyboard.DOWN){
 					cambio = 1;
+					
 					
 				}else if(key == Keyboard.UP){
 					cambio = -1;
@@ -376,6 +393,7 @@
 			}
 			
 			if(estado == 'Principal' || estado == 'Ganaste'){
+				
 				if(key == Keyboard.INSERT)
 					this.fachada.cambiarTurno(1);
 				else if(key == Keyboard.HOME)
@@ -389,9 +407,6 @@
 				else if(key == Keyboard.PAGE_DOWN)
 					this.fachada.cambiarTurno(6);
 				
-				if(estado == 'Ganaste'){
-					this.currentState = fachada.terminado?'FinJuego':'Principal';
-				}
 			}
 		}
 		
@@ -439,26 +454,28 @@
 			this.currentState = "Comenzar";
 		}
 		
-		public function timerGanador():void{
+		public function timerSiguienteTurno():void{
 			var timer:Timer = new Timer(1000,5);
+			var me:Rana = this;
 			timer.addEventListener(TimerEvent.TIMER_COMPLETE,function():void
 			{
-				this.currentState = "Principal";
+				if(me.currentState!='Principal') //si es principal ya oprimieron el boton antes
+					me.cambiarTurno(new RanaEvento(RanaEvento.RANA_TURNO_CAMBIADO,me.fachada.getSiguienteTurno()));
 			});
-			//timer.start(); por ahora seria mejor solo cambiar de turno
+			timer.start();
 			
 		}
 			]]></fx:Script>
 	<s:states>
 		<s:State enterState="temporizarRecords()" name="Comenzar"/>
 		<s:State enterState="actualizarRecords()" name="Puntajes"/>
-		<s:State name="TipoDeJuego"/>
+		<s:State name="TipoDeJuego" enterState="limpiarBotonesTipoDeJuego()"/>
 		<s:State name="Grupos"/>
 		<s:State name="Jugadores"/>
 		<s:State name="Principal"/>
-		<s:State name="Blanqueado"/>
+		<s:State name="Blanqueado" enterState="timerSiguienteTurno()"/>
 		<s:State name="FinJuego"/>
-		<s:State name="Ganaste" enterState="timerGanador()"/>
+		<s:State name="Ganaste" enterState="timerSiguienteTurno()"/>
 		<s:State name="Video"/>
 	</s:states>
 	
@@ -655,34 +672,32 @@
 					   x="0" y="0" smooth="true" source="@Embed('/assets/images/rana-v2/Fondo.png')"/>
 		<components:JugadorCustomComponent id="jugador6" d:userLabel="ta-jugador6"
 										   includeIn="Comenzar,Principal,Ganaste" x="16" y="591"
-										   currentState="desactivado"
+										   
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador5" d:userLabel="ta-jugador5"
 										   includeIn="Comenzar,Principal,Ganaste" x="16" y="476"
-										   currentState="desactivado"
+										   
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador4" d:userLabel="ta-jugador4"
 										   includeIn="Comenzar,Principal,Ganaste" x="16" y="361"
-										   currentState="desactivado"
+										   
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador3" d:userLabel="ta-jugador3"
 										   includeIn="Comenzar,Principal,Ganaste" x="16" y="245"
-										   currentState="desactivado"
+										   
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador2" d:userLabel="ta-jugador2"
 										   includeIn="Comenzar,Principal,Ganaste" x="16" y="129"
-										   currentState="desactivado"
+										   
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador1" d:userLabel="ta-jugador1"
 										   includeIn="Comenzar,Principal,Ganaste" x="16" y="13"
-										   currentState="desactivado"
-										   visible.Principal="true"
-										   currentState.Principal="desactivado">
+										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<s:BitmapImage d:userLabel="Forma 4 copia"
 					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
@@ -984,7 +999,7 @@
 	 </s:filters>
 	</s:Label>
 	<components:BotonPuntos id="btnCuatrocientos" includeIn="TipoDeJuego" x="30" y="183" height="85"
-							label="400 Puntos"/>
+							label="400 Puntos" />
 	<components:BotonPuntos id="btnOchocientos" includeIn="TipoDeJuego" x="30" y="288" height="85"
 							label="800 Puntos"/>
 	<components:BotonPuntos id="btnMildoscientos" includeIn="TipoDeJuego" x="30" y="400" height="85"

@@ -121,14 +121,9 @@ package model {
 			return this.maxLanzamientos;
 		}
 		
-		/**
-		 * 
-		 * @param nuevoTurno	Un numero entre 1 y el numero de jugadores
-		 */
-		public function cambiarTurno(nuevoTurno:int):void {
-			// Verificamos que el nuevo turno conincida con el siguiente turno en el juego
-			var encontro:Boolean = false;
+		public function getSiguienteTurno():int{
 			var turnoTemp:int;
+			var encontro:Boolean = false;
 			for(var i:int=(this.turno+1)%this.numJugadores; (i!=this.turno) && !encontro ; i=(i+1)%this.numJugadores){
 				i = i==0 ? this.numJugadores : i;
 				if(jugadores[i-1].getEstado()){
@@ -136,10 +131,20 @@ package model {
 					turnoTemp = i;
 				}
 			}
+			return turnoTemp;
+		}
+		
+		/**
+		 * 
+		 * @param nuevoTurno	Un numero entre 1 y el numero de jugadores
+		 */
+		public function cambiarTurno(nuevoTurno:int):void {
+			// Verificamos que el nuevo turno conincida con el siguiente turno en el juego
+			var turnoTemp:int = this.getSiguienteTurno();
 			
 			//nuevoTurno = turnoTemp;	// Saltandome el ingreso del turno
 			
-			if(nuevoTurno!=turnoTemp)
+			if(nuevoTurno!==turnoTemp)
 				throw new RanaException("Verifique el turno ingresado, ya que no correspone con el siguiente turno",RanaException.TURNO_INVALIDO);
 			
 			// 	Verificamos que el jugador no se haya ido blanqueado

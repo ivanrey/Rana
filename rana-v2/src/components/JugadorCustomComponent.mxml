@@ -3,7 +3,7 @@
 		 xmlns:fx="http://ns.adobe.com/mxml/2009"
 		 xmlns:d="http://ns.adobe.com/fxg/2008/dt"
 		 xmlns:components="components.*"
-		 show="mostrarFunc(event)"
+		 currentState="desactivado" show="mostrarFunc(event)"
 		 width.activado="322" height.activado="128"
 		 height.desactivado="128">
 	<fx:Script><![CDATA[
@@ -54,6 +54,7 @@
 		
 		public function desactivarTurno():void{
 			this.currentState = "desactivado";	
+			trace("desactivando"+this.lbl_nom_jugador.text);
 		}
 		
 		public function cambiarPuntaje(puntaje:int):void{
