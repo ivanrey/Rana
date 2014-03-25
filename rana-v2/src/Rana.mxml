@@ -3,9 +3,10 @@
 					   xmlns:fx="http://ns.adobe.com/mxml/2009"
 					   xmlns:s="library://ns.adobe.com/flex/spark"
 					   xmlns:components="components.*"
+					   xmlns:util="util.*"
 					   width="1280" height="768" addedToStage="inicializarKeyListeners()"
 					   backgroundColor="#FFFFFF" creationComplete="inicializar()"
-					   currentState="Comenzar" preloaderChromeColor="#FFFFFF" showStatusBar="false" xmlns:util="util.*">
+					   currentState="Comenzar" preloaderChromeColor="#FFFFFF" showStatusBar="false">
 	<fx:Style source="Rana.css"/>
 	<fx:Script><![CDATA[
 		import flash.filters.BitmapFilterQuality;
@@ -236,9 +237,17 @@
 		
 		public function click(event:MouseEvent):void{
 			if(this.currentState == 'Jugadores'){
-				var jugadores:int = this.fachada.agregarCredito();
-				for(var i:int=0;i<jugadores && i<6;i++)
+				var jugadores:Number = this.fachada.agregarCredito();
+				var i:int=0;
+				for(;i<jugadores && i<6;i++){
 					this.arrayJugadoresGraf[i].enabled = true;
+				}
+				
+				//Calcular el porcentaje del ultimo
+				var porcentaje:int = (jugadores - Math.floor(jugadores))*100;
+				this.arrayJugadoresGraf[i-1].porcentaje = porcentaje == 0? 100: porcentaje;
+				
+				
 			}
 		}
 		
@@ -469,13 +478,13 @@
 	<s:states>
 		<s:State enterState="temporizarRecords()" name="Comenzar"/>
 		<s:State enterState="actualizarRecords()" name="Puntajes"/>
-		<s:State name="TipoDeJuego" enterState="limpiarBotonesTipoDeJuego()"/>
+		<s:State enterState="limpiarBotonesTipoDeJuego()" name="TipoDeJuego"/>
 		<s:State name="Grupos"/>
 		<s:State name="Jugadores"/>
 		<s:State name="Principal"/>
-		<s:State name="Blanqueado" enterState="timerSiguienteTurno()"/>
+		<s:State enterState="timerSiguienteTurno()" name="Blanqueado"/>
 		<s:State name="FinJuego"/>
-		<s:State name="Ganaste" enterState="timerSiguienteTurno()"/>
+		<s:State enterState="timerSiguienteTurno()" name="Ganaste"/>
 		<s:State name="Video"/>
 	</s:states>
 	
@@ -623,8 +632,9 @@
 		<s:RichText id="lbl_texto_credito" d:userLabel="j-dinero"
 					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
 					x="605" y="503" color="#d56e00" fontFamily="Counter-Strike" fontSize="93.48"
-					fontWeight="bold" kerning="off" lineHeight="652.7%" textAlign="right"
-					whiteSpaceCollapse="preserve" text="{fachada.credito} Crédito{fachada.credito>1?'s':''}"
+					fontWeight="bold" kerning="off" lineHeight="652.7%"
+					text="{fachada.credito} Crédito{fachada.credito&gt;1?'s':''}" textAlign="right"
+					whiteSpaceCollapse="preserve"
 					x.Jugadores="601" y.Jugadores="490">
 			<s:filters>
 				<s:DropShadowFilter includeIn="Jugadores" alpha="1" angle="45.0" blurX="6" blurY="6"
@@ -639,25 +649,29 @@
 					whiteSpaceCollapse="preserve">
 			<s:content><s:p><s:span>Crédito</s:span></s:p></s:content>
 		</s:RichText>
-		<s:Button id="button5" d:userLabel="j-jugador6"
-				  includeIn="Blanqueado,Comenzar,FinJuego,Jugadores,Principal" x="1051" y="135"
-				  label="jugador 6" enabled="false" skinClass="components.ItemSeleccionJugador"/>
-		<s:Button id="button4" d:userLabel="j-jugador5"
-				  includeIn="Blanqueado,Comenzar,FinJuego,Jugadores,Principal" x="855" y="135"
-				  label="jugador 5" enabled="false" skinClass="components.ItemSeleccionJugador"
-				  label.Jugadores="jugador 5"/>
-		<s:Button id="button3" d:userLabel="j-jugador4"
-				  includeIn="Blanqueado,Comenzar,FinJuego,Jugadores,Principal" x="656" y="136"
-				  label="jugador 4" enabled="false" skinClass="components.ItemSeleccionJugador"/>
-		<s:Button id="button2" d:userLabel="j-jugador3" includeIn="Comenzar,Jugadores" x="460"
-				  y="136" label="jugador 3" enabled="false" skinClass="components.ItemSeleccionJugador"
-				  label.Jugadores="jugador 3"/>
-		<s:Button id="button1" d:userLabel="j-jugador2"
-				  includeIn="Blanqueado,Comenzar,FinJuego,Jugadores,Principal" x="264" y="135"
-				  label="jugador 2" enabled="false" skinClass="components.ItemSeleccionJugador"/>
-		<s:Button id="button0" d:userLabel="j-jugador1"
-				  includeIn="Blanqueado,Comenzar,FinJuego,Jugadores,Principal" x="65" y="136"
-				  label="jugador 1" enabled="false" skinClass="components.ItemSeleccionJugador"/>
+		<components:JugadorSeleccion id="button5" d:userLabel="j-jugador6"
+									 includeIn="Blanqueado,Comenzar,FinJuego,Jugadores,Principal"
+									 x="1051" y="135" label="{jugador1.tipoJugador} 6" enabled="false"
+									 skinClass="components.ItemSeleccionJugador"/>
+		<components:JugadorSeleccion id="button4" d:userLabel="j-jugador5"
+									 includeIn="Blanqueado,Comenzar,FinJuego,Jugadores,Principal"
+									 x="855" y="135" label="{jugador1.tipoJugador} 5" enabled="false"
+									 skinClass="components.ItemSeleccionJugador"/>
+		<components:JugadorSeleccion id="button3" d:userLabel="j-jugador4"
+									 includeIn="Blanqueado,Comenzar,FinJuego,Jugadores,Principal"
+									 x="656" y="136" label="{jugador1.tipoJugador} 4" enabled="false"
+									 skinClass="components.ItemSeleccionJugador"/>
+		<components:JugadorSeleccion id="button2" d:userLabel="j-jugador3"
+									 includeIn="Comenzar,Jugadores" x="460" y="136"
+									 label="{jugador1.tipoJugador} 3" enabled="false"
+									 skinClass="components.ItemSeleccionJugador"/>
+		<components:JugadorSeleccion id="button1" d:userLabel="j-jugador2"
+									 includeIn="Blanqueado,Comenzar,FinJuego,Jugadores,Principal"
+									 x="264" y="135" label="{jugador1.tipoJugador} 2" enabled="false"
+									 skinClass="components.ItemSeleccionJugador"/>
+		<components:JugadorSeleccion id="button0" d:userLabel="j-jugador1"
+									 includeIn="Blanqueado,Comenzar,FinJuego,Jugadores,Principal"
+									 x="65" y="136" label="{jugador1.tipoJugador} 1" enabled="true" porcentaje="50"/>
 	</fx:DesignLayer>
 	<fx:DesignLayer id="designlayer5" d:userLabel="TurnoActual"
 					visible.Blanqueado="false"
@@ -672,27 +686,22 @@
 					   x="0" y="0" smooth="true" source="@Embed('/assets/images/rana-v2/Fondo.png')"/>
 		<components:JugadorCustomComponent id="jugador6" d:userLabel="ta-jugador6"
 										   includeIn="Comenzar,Principal,Ganaste" x="16" y="591"
-										   
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador5" d:userLabel="ta-jugador5"
 										   includeIn="Comenzar,Principal,Ganaste" x="16" y="476"
-										   
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador4" d:userLabel="ta-jugador4"
 										   includeIn="Comenzar,Principal,Ganaste" x="16" y="361"
-										   
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador3" d:userLabel="ta-jugador3"
 										   includeIn="Comenzar,Principal,Ganaste" x="16" y="245"
-										   
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador2" d:userLabel="ta-jugador2"
 										   includeIn="Comenzar,Principal,Ganaste" x="16" y="129"
-										   
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador1" d:userLabel="ta-jugador1"
@@ -719,8 +728,8 @@
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio10" includeIn="Comenzar,Principal" x="738"
-											 y="105" valor="10">
+			<components:FormaCustomComponent id="bmp_orificio10" includeIn="Comenzar,Principal"
+											 x="738" y="105" valor="10">
 			</components:FormaCustomComponent>
 			<fx:DesignLayer d:userLabel="Layer 2"/>
 		</fx:DesignLayer>
@@ -728,93 +737,93 @@
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio12" includeIn="Comenzar,Principal" x="1060"
-											 y="105" valor="10">
+			<components:FormaCustomComponent id="bmp_orificio12" includeIn="Comenzar,Principal"
+											 x="1060" y="105" valor="10">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer9" d:userLabel="100"
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio11" includeIn="Comenzar,Principal" x="899"
-											 y="105" amarilla="true" valor="100">
+			<components:FormaCustomComponent id="bmp_orificio11" includeIn="Comenzar,Principal"
+											 x="899" y="105" amarilla="true" valor="100">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer10" d:userLabel="120"
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio8" includeIn="Comenzar,Principal" x="899" y="267"
-											 amarilla="true" valor="120">
+			<components:FormaCustomComponent id="bmp_orificio8" includeIn="Comenzar,Principal"
+											 x="899" y="267" amarilla="true" valor="120">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer11" d:userLabel="15"
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio7" includeIn="Comenzar,Principal" x="738" y="267"
-											 valor="15">
+			<components:FormaCustomComponent id="bmp_orificio7" includeIn="Comenzar,Principal"
+											 x="738" y="267" valor="15">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer12" d:userLabel="15 copia"
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio9" includeIn="Comenzar,Principal" x="1060"
-											 y="267" valor="15">
+			<components:FormaCustomComponent id="bmp_orificio9" includeIn="Comenzar,Principal"
+											 x="1060" y="267" valor="15">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer13" d:userLabel="20"
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio4" includeIn="Comenzar,Principal" x="738" y="432"
-											 valor="20">
+			<components:FormaCustomComponent id="bmp_orificio4" includeIn="Comenzar,Principal"
+											 x="738" y="432" valor="20">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer14" d:userLabel="20 copia"
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio6" includeIn="Comenzar,Principal" x="1060"
-											 y="432" valor="20">
+			<components:FormaCustomComponent id="bmp_orificio6" includeIn="Comenzar,Principal"
+											 x="1060" y="432" valor="20">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer15" d:userLabel="40"
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio5" includeIn="Comenzar,Principal" x="899" y="432"
-											 valor="40">
+			<components:FormaCustomComponent id="bmp_orificio5" includeIn="Comenzar,Principal"
+											 x="899" y="432" valor="40">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer16" d:userLabel="30"
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio1" includeIn="Comenzar,Principal" x="738" y="595"
-											 valor="30">
+			<components:FormaCustomComponent id="bmp_orificio1" includeIn="Comenzar,Principal"
+											 x="738" y="595" valor="30">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer17" d:userLabel="30 copia"
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio2" includeIn="Comenzar,Principal" x="899" y="595"
-											 valor="30">
+			<components:FormaCustomComponent id="bmp_orificio2" includeIn="Comenzar,Principal"
+											 x="899" y="595" valor="30">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer18" d:userLabel="30 copia 2"
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
-			<components:FormaCustomComponent id="bmp_orificio3" includeIn="Comenzar,Principal" x="1060"
-											 y="595" valor="30">
+			<components:FormaCustomComponent id="bmp_orificio3" includeIn="Comenzar,Principal"
+											 x="1060" y="595" valor="30">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer d:userLabel="Turno actual">
 			<s:List id="lst_puntajes_turnos" d:userLabel="ta-datalistturnos" includeIn="Principal"
-				 x="319" y="472" skinClass="components.UltimosPuntajes">
+					x="319" y="472" skinClass="components.UltimosPuntajes">
 				
 			</s:List>
 			<s:BitmapImage d:userLabel="ta-div1"
@@ -999,7 +1008,7 @@
 	 </s:filters>
 	</s:Label>
 	<components:BotonPuntos id="btnCuatrocientos" includeIn="TipoDeJuego" x="30" y="183" height="85"
-							label="400 Puntos" />
+							label="400 Puntos"/>
 	<components:BotonPuntos id="btnOchocientos" includeIn="TipoDeJuego" x="30" y="288" height="85"
 							label="800 Puntos"/>
 	<components:BotonPuntos id="btnMildoscientos" includeIn="TipoDeJuego" x="30" y="400" height="85"
@@ -1018,7 +1027,8 @@
 							label="Equipos de 2"/>
 	<components:BotonPuntos id="btnEquipo3" includeIn="Grupos" x="234" y="442" height="66"
 							label="Equipos de 3"/>
-	<s:Label includeIn="FinJuego" x="101" y="54" text="Fin del Chico #{fachada.numChico}" verticalAlign="middle">
+	<s:Label includeIn="FinJuego" x="101" y="54" text="Fin del Chico #{fachada.numChico}"
+			 verticalAlign="middle">
 		<s:filters>
 			<s:GlowFilter blurX="12" blurY="12" color="#48b0f7" quality="{BitmapFilterQuality.HIGH}"
 						  strength="3"/>

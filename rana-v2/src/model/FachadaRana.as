@@ -48,11 +48,11 @@ package model {
 		 * el tipo de juego seleccionado
 		 * @return 	El numero de jugadores posibles
 		 */
-		public function agregarCredito():int {
+		public function agregarCredito():Number {
 			this.credito++;
 			
 			this.sonar("moneda");
-			return this.getCantidadJugadoresCredito();
+			return this.getCantidadJugadoresCredito(false);
 		}
 		
 		public function sonar(sonido:String):void{
@@ -82,8 +82,10 @@ package model {
 				
 		}
 		
-		public function getCantidadJugadoresCredito():int{
-			return Math.floor(this._credito/(this.getMonedasPorPersona()*this.participantesPorJugador));
+		public function getCantidadJugadoresCredito(floor:Boolean = true):Number{
+			var participantes:Number = this._credito/(this.getMonedasPorPersona()*this.participantesPorJugador);
+			
+			return floor?Math.floor(participantes):participantes;
 		}
 		
 		public function setTipoJuego(tipo:int):void{

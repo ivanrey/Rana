@@ -1,24 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Group xmlns:s="library://ns.adobe.com/flex/spark" xmlns:fx="http://ns.adobe.com/mxml/2009">
-	<s:states>
-		<s:State name="Juega"/>
-		<s:State name="NoJuega"/>
-	</s:states>
-	<s:Button id="button0" label="jugador 3" skinClass="components.ItemSeleccionJugador" x="0" y="0" alpha.NoJuega="0.3"/>
-	<s:transitions>
-		<s:Transition fromState="NoJuega" toState="Juega" autoReverse="true">
-			<s:Parallel>
-				<s:Parallel target="{button0}">
-					<s:Fade duration="0"/>
-				</s:Parallel>
-			</s:Parallel>
-		</s:Transition>
-		<s:Transition fromState="Juega" toState="NoJuega" autoReverse="true">
-			<s:Parallel>
-				<s:Parallel target="{button0}">
-					<s:Fade duration="0"/>
-				</s:Parallel>
-			</s:Parallel>
-		</s:Transition>
-	</s:transitions>
-</s:Group>
+<s:Button xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:fx="http://ns.adobe.com/mxml/2009" skinClass="components.ItemSeleccionJugador">
+	<fx:Script>
+		<![CDATA[
+			[Bindable]
+			public var porcentaje:int = 50;
+		]]>
+	</fx:Script>	
+</s:Button>

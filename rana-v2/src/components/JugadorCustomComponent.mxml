@@ -14,7 +14,7 @@
 		public var puntajeMax:int;
 		
 		[Bindable]
-		private var tipoJugador:String = 'Jugador';
+		public var tipoJugador:String = 'Jugador';
 		[Bindable]
 		private var letraJugador:String = '@'; //cuando juegan por equipos cada jugador tiene una letra
 		private var maxJugadores:int = 0;
