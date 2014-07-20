@@ -17,6 +17,7 @@ package model{
 		public static const FIN_JUEGO_BLANQUEADO:String = "FinJuegoBlanqueados";
 		
 		public static const GANADOR:String = "Ganador";
+		public static const MONONA:int = 5;
 		
 		public var params:*;
 		

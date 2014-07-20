@@ -41,6 +41,7 @@ package model {
 			if(jugadoresActivos == 1)
 				this.finalizarJuego(RanaEvento.FIN_JUEGO_NORMAL);
 			
+			
 		}
 		
 		public function getPuestos():Array{
@@ -105,12 +106,38 @@ package model {
 			dispatchEvent(new RanaEvento(RanaEvento.RANA_ARGOLLA_INSERTADA,new Array(puntaje,this.puntajeTurno,orificio)));
 			
 			// Verificamos si el jugador actual gano
-			if(jugador.getPuntajeActual() + this.puntajeTurno >= this.puntajeMaximo){
+			var monona:Boolean = this.hayMonona();
+			if(jugador.getPuntajeActual() + this.puntajeTurno >= this.puntajeMaximo || monona){
 				jugador.sumarPuntos(this.puntajeTurno,this.puntajeMaximo);
-				dispatchEvent(new RanaEvento(RanaEvento.GANADOR, new Array(puntaje, this.puntajeTurno, orificio, this.puntajeMaximo, jugador)));
+				dispatchEvent(new RanaEvento(RanaEvento.GANADOR, new Array(puntaje, this.puntajeTurno, orificio, this.puntajeMaximo, jugador,monona)));
 			}
 			
 			
+		}
+		
+		/**
+		 * Una moñona se da cuando se inserta en la rana o la ranita y se insertan todas las demas fichas (inclusive en una rana o ranita)
+		 * @return boolean true si el turno actual es moñona
+		 */ 
+		public function hayMonona():Boolean{
+			
+			var hizoRanaORanita:Boolean = false;
+			//se podría hacer en un solo ciclo pero es más fácil de entender en 2 pasos
+			for each (var puntaje:int in this.puntajesTurno){ 
+				if(puntaje == configuracion.getPuntoEnOrificio(Configuracion.orificioRana) || 
+					puntaje == configuracion.getPuntoEnOrificio(Configuracion.orificioRanita) ){
+					hizoRanaORanita = true;
+					break;
+				}
+			}
+			
+			
+ 			if(hizoRanaORanita && this.puntajesTurno.length == configuracion.maxFichas )
+			{
+				return true;
+			}
+
+			return false;
 		}
 		
 		public function getJugadorEnTurno():Jugador{

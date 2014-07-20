@@ -23,6 +23,9 @@ package  model {
 		public static var equiposDeDos:int = 2;
 		public static var equiposDeTres:int = 3;
 		
+		public static var orificioRana:int = 11;
+		public static var orificioRanita:int = 8;
+		
 		private var xmlFile:XML;
 		public var maxBlanqueadas:int;
 		/**

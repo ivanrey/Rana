@@ -128,7 +128,7 @@
 		}
 		
 		public function cambiarTurno(event:RanaEvento):void{
-			if(currentState == 'Ganaste'){
+			if(currentState == 'Ganaste' || currentState == 'Monona'){
 				this.currentState = fachada.terminado?'FinJuego':'Principal';
 			}
 			
@@ -154,7 +154,7 @@
 		
 		public function ganador(event:RanaEvento):void{
 			if(event.type == RanaEvento.GANADOR){
-				this.currentState = "Ganaste";
+				this.currentState = event.params[RanaEvento.MONONA]?"Monona":"Ganaste";
 				this.lbl_nomJugador.text = "Jugador "+this.fachada.consultarTurno();
 			}
 		}
@@ -401,7 +401,7 @@
 					this.fachada.sumarPuntos(12);
 			}
 			
-			if(estado == 'Principal' || estado == 'Ganaste'){
+			if(estado == 'Principal' || estado == 'Ganaste' || estado == 'Monona'){
 				
 				if(key == Keyboard.INSERT)
 					this.fachada.cambiarTurno(1);
@@ -469,7 +469,7 @@
 			timer.addEventListener(TimerEvent.TIMER_COMPLETE,function():void
 			{
 				if(me.currentState!='Principal') //si es principal ya oprimieron el boton antes
-					me.cambiarTurno(new RanaEvento(RanaEvento.RANA_TURNO_CAMBIADO,me.fachada.getSiguienteTurno()));
+					me.fachada.cambiarTurno(me.fachada.getSiguienteTurno());
 			});
 			timer.start();
 			
@@ -486,6 +486,7 @@
 		<s:State name="FinJuego"/>
 		<s:State enterState="timerSiguienteTurno()" name="Ganaste"/>
 		<s:State name="Video"/>
+		<s:State enterState="timerSiguienteTurno()" name="Monona"/>
 	</s:states>
 	
 	<fx:DesignLayer id="designlayer1" d:userLabel="Comenzar"
@@ -493,19 +494,20 @@
 					visible.FinJuego="false"
 					visible.Ganaste="false"
 					visible.Jugadores="false"
+					visible.Monona="false"
 					visible.Principal="false"
 					visible.Puntajes="false"
 					visible.TipoDeJuego="false">
 		<s:BitmapImage d:userLabel="c-fondo"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					   x="0" y="0" smooth="true" source="@Embed('/assets/images/rana-v2/Fondo.png')"/>
 		<s:BitmapImage id="bitmapimage6" d:userLabel="c-presioneiniciar"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					   x="466" y="419" smooth="true"
 					   source="@Embed('/assets/images/comenzar/presione iniciar.png')"
 					   x.Comenzar="464" y.Comenzar="401"/>
 		<s:BitmapImage id="bitmapimage2" d:userLabel="c-ranas"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					   x="-283" y="114" smooth="true"
 					   source="@Embed('/assets/images/comenzar/Ranas.png')"
 					   x.Comenzar="1" y.Comenzar="111"/>
@@ -519,6 +521,7 @@
 					visible.FinJuego="false"
 					visible.Ganaste="false"
 					visible.Jugadores="false"
+					visible.Monona="false"
 					visible.Principal="false"
 					visible.TipoDeJuego="false">
 		<s:BitmapImage id="bitmapimage3" d:userLabel="r-fondo" includeIn="Puntajes" x="0" y="0"
@@ -528,11 +531,7 @@
 		<s:List id="lst_records" d:userLabel="r-datalist" includeIn="Puntajes" x="352" y="196"
 				enabled="true" skinClass="components.ListaRecords" textAlign="left">
 			<s:ArrayCollection>
-				<fx:Object text1="APODOPERSONAJE" text2="79,3%"/>
-				<fx:Object text1="OTRO" text2="85.5%"/>
-				<fx:Object text1="MAS SUPER DURO DE TODOS" text2="14%"/>
-				<fx:Object text1="EL VAGO" text2="05%"/>
-				<fx:Object text1="RE VAGO" text2="0.2%"/>
+				
 			</s:ArrayCollection>
 		</s:List>
 	</fx:DesignLayer>
@@ -542,33 +541,48 @@
 					visible.FinJuego="false"
 					visible.Ganaste="true"
 					visible.Jugadores="false"
+					visible.Monona="true"
 					visible.Principal="false"
 					visible.Puntajes="false"
 					visible.TipoDeJuego="false">		
 		<s:BitmapImage id="bitmapimage53" d:userLabel="r-fondo"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					   x="0" y="0" smooth="true" source="@Embed('/assets/images/rana-v2/Fondo.png')"/>
 		<s:BitmapImage d:userLabel="g-rana"
 					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
 					   x="899" y="197" smooth="true"
 					   source="@Embed('/assets/images/rana-v2/rana_felicitaciones.png')"/>
 		<s:RichText id="richtext58" d:userLabel="g-ereselganador"
-					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					includeIn="Ganaste"
 					x="94" y="187" color="#ffffff" fontFamily="Counter-Strike" fontSize="84.098"
 					fontWeight="bold" kerning="off" lineHeight="222.95%" textAlign="right"
 					whiteSpaceCollapse="preserve"
-					x.FinJuego="93" y.FinJuego="251"
 					x.Ganaste="94.15" y.Ganaste="335.45">
-			<s:content><s:p><s:span>¡Has llegado a la meta!</s:span></s:p></s:content>
+			<s:content><s:p><s:span>¡Ganaste!</s:span></s:p></s:content>
 			<s:filters>
-				<s:GlowFilter includeIn="FinJuego" blurX="12" blurY="12" color="#000000"
+				<s:GlowFilter includeIn="Ganaste" blurX="12" blurY="12" color="#000000"
 							  quality="{BitmapFilterQuality.HIGH}" strength="3"/>
 				<s:DropShadowFilter alpha="0.9" angle="90" blurX="8" blurY="20" color="#252525"
 									distance="24" hideObject="false" inner="true" knockout="false"
 									quality="2" strength="1"/>
 			</s:filters>
 		</s:RichText>
-		<s:RichText id="lbl_nomJugador" d:userLabel="g-ereselganador" includeIn="Ganaste" x="102.6"
+		<s:RichText id="richtext59" d:userLabel="g-ereselganador"
+					includeIn="Monona"
+					x="94" y="187" color="#ffffff" fontFamily="Counter-Strike" fontSize="84.098"
+					fontWeight="bold" kerning="off" lineHeight="222.95%" textAlign="right"
+					whiteSpaceCollapse="preserve"
+					x.Monona="94.15" y.Monona="335.45">
+			<s:content><s:p><s:span>¡Hiciste MOÑONA!</s:span></s:p></s:content>
+			<s:filters>
+				<s:GlowFilter includeIn="Monona" blurX="12" blurY="12" color="#000000"
+							  quality="{BitmapFilterQuality.HIGH}" strength="3"/>
+				<s:DropShadowFilter alpha="0.9" angle="90" blurX="8" blurY="20" color="#252525"
+									distance="24" hideObject="false" inner="true" knockout="false"
+									quality="2" strength="1"/>
+			</s:filters>
+		</s:RichText>
+		<s:RichText id="lbl_nomJugador" d:userLabel="g-ereselganador" includeIn="Ganaste,Monona" x="102.6"
 					y="172.9" height="139" color="#ffffff" fontFamily="Counter-Strike"
 					fontSize="84.098" fontWeight="bold" kerning="off" lineHeight="222.95%"
 					text="Jugador 1&#xd;" textAlign="right" whiteSpaceCollapse="preserve">
@@ -579,7 +593,7 @@
 		</s:filters>
 		</s:RichText>
 		<s:BitmapImage d:userLabel="g-felicitaciones"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					   visible="false" x="95" y="80" smooth="true"
 					   source="@Embed('/assets/images/rana-v2/FELICITACIONES.png')"/>
 	</fx:DesignLayer>
@@ -589,22 +603,23 @@
 					visible.FinJuego="false"
 					visible.Ganaste="false"
 					visible.Jugadores="false"
+					visible.Monona="false"
 					visible.Principal="false"
 					visible.Puntajes="false">
 		<s:BitmapImage d:userLabel="t-fondo"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					   x="0" y="0" smooth="true" source="@Embed('/assets/images/rana-v2/Fondo.png')"/>
 		<s:BitmapImage d:userLabel="t-presioneiniciar"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					   x="282" y="632" smooth="true"
 					   source="@Embed('/assets/images/rana-v2/presione iniciar.png')"
 					   x.TipoDeJuego="282" y.TipoDeJuego="595"/>
 		<s:BitmapImage d:userLabel="t-seleccione"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes"
+					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes"
 					   x="425" y="174" smooth="true"
 					   source="@Embed('/assets/images/rana-v2/seleccione copia.png')"/>
 		<s:BitmapImage d:userLabel="t-titulo"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes"
+					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes"
 					   x="156" y="100" smooth="true"
 					   source="@Embed('/assets/images/rana-v2/TIPO DE JUEGO.png')"/>
 	</fx:DesignLayer>
@@ -613,11 +628,12 @@
 					visible.Comenzar="false"
 					visible.FinJuego="false"
 					visible.Ganaste="false"
+					visible.Monona="false"
 					visible.Principal="false"
 					visible.Puntajes="false"
 					visible.TipoDeJuego="false">
 		<s:BitmapImage id="bitmapimage5" d:userLabel="j-fondo"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					   smooth="true" source="@Embed('/assets/images/rana-v2/Fondo.png')"
 					   x.Blanqueado="0" y.Blanqueado="0"
 					   x.Comenzar="0" y.Comenzar="0"
@@ -626,11 +642,11 @@
 					   x.Puntajes="0" y.Puntajes="0"
 					   x.TipoDeJuego="0" y.TipoDeJuego="0"/>
 		<s:BitmapImage d:userLabel="j-presioneiniciar"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					   x="273" y="623" smooth="true"
 					   source="@Embed('/assets/images/rana-v2/presione iniciar.png')"/>
 		<s:RichText id="lbl_texto_credito" d:userLabel="j-dinero"
-					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					x="605" y="503" color="#d56e00" fontFamily="Counter-Strike" fontSize="93.48"
 					fontWeight="bold" kerning="off" lineHeight="652.7%"
 					text="{fachada.credito} Crédito{fachada.credito&gt;1?'s':''}" textAlign="right"
@@ -643,7 +659,7 @@
 			</s:filters>
 		</s:RichText>
 		<s:RichText d:userLabel="j-saldo"
-					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Principal,Puntajes,TipoDeJuego"
+					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Monona,Principal,Puntajes,TipoDeJuego"
 					x="361" y="496" color="#ffffff" fontFamily="Counter-Strike" fontSize="69.81"
 					fontWeight="bold" kerning="off" lineHeight="652.7%" textAlign="right"
 					whiteSpaceCollapse="preserve">
@@ -679,37 +695,38 @@
 					visible.FinJuego="false"
 					visible.Ganaste="false"
 					visible.Jugadores="false"
+					visible.Monona="false"
 					visible.Puntajes="false"
 					visible.TipoDeJuego="false">
 		<s:BitmapImage d:userLabel="ta-fondo"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					   x="0" y="0" smooth="true" source="@Embed('/assets/images/rana-v2/Fondo.png')"/>
 		<components:JugadorCustomComponent id="jugador6" d:userLabel="ta-jugador6"
-										   includeIn="Comenzar,Principal,Ganaste" x="16" y="591"
+										   includeIn="Comenzar,Ganaste,Monona,Principal" x="16" y="591"
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador5" d:userLabel="ta-jugador5"
-										   includeIn="Comenzar,Principal,Ganaste" x="16" y="476"
+										   includeIn="Comenzar,Ganaste,Monona,Principal" x="16" y="476"
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador4" d:userLabel="ta-jugador4"
-										   includeIn="Comenzar,Principal,Ganaste" x="16" y="361"
+										   includeIn="Comenzar,Ganaste,Monona,Principal" x="16" y="361"
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador3" d:userLabel="ta-jugador3"
-										   includeIn="Comenzar,Principal,Ganaste" x="16" y="245"
+										   includeIn="Comenzar,Ganaste,Monona,Principal" x="16" y="245"
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador2" d:userLabel="ta-jugador2"
-										   includeIn="Comenzar,Principal,Ganaste" x="16" y="129"
+										   includeIn="Comenzar,Ganaste,Monona,Principal" x="16" y="129"
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<components:JugadorCustomComponent id="jugador1" d:userLabel="ta-jugador1"
-										   includeIn="Comenzar,Principal,Ganaste" x="16" y="13"
+										   includeIn="Comenzar,Ganaste,Monona,Principal" x="16" y="13"
 										   visible.Principal="true">
 		</components:JugadorCustomComponent>
 		<s:BitmapImage d:userLabel="Forma 4 copia"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					   x="298" y="30" smooth="true"
 					   source="@Embed('/assets/images/rana-v2/Forma 4 copia.png')"
 					   x.Principal="300" y.Principal="26">
@@ -827,7 +844,7 @@
 				
 			</s:List>
 			<s:BitmapImage d:userLabel="ta-div1"
-						   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+						   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 						   x="314" y="49" alpha="0.4" smooth="true"
 						   source="@Embed('/assets/images/rana-v2/Forma 7 copia 4.png')">
 				<s:mask>
@@ -842,21 +859,21 @@
 				</s:mask>
 			</s:BitmapImage>
 			<s:RichText d:userLabel="ta-puntos"
-						includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+						includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 						x="516" y="61" color="#ffffff" fontFamily="Counter-Strike" fontSize="30"
 						fontWeight="bold" kerning="off" lineHeight="652.7%"
 						whiteSpaceCollapse="preserve">
 				<s:content><s:p><s:span>puntos</s:span></s:p></s:content>
 			</s:RichText>
 			<s:RichText d:userLabel="ta-turno"
-						includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+						includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 						x="319" y="61" color="#ffffff" fontFamily="Counter-Strike" fontSize="30"
 						fontWeight="bold" kerning="off" lineHeight="652.7%"
 						whiteSpaceCollapse="preserve">
 				<s:content><s:p><s:span>turno</s:span></s:p></s:content>
 			</s:RichText>
 			<s:RichText id="lbl_puntaje" d:userLabel="ta-puntosdelturno"
-						includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+						includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 						x="517" y="92" color="#f69c00" fontFamily="Counter-Strike" fontSize="70.86"
 						fontWeight="bold" kerning="off" lineHeight="652.7%"
 						whiteSpaceCollapse="preserve"
@@ -876,7 +893,7 @@
 				</s:filters>
 			</s:RichText>
 			<s:RichText id="lbl_turno" d:userLabel="ta-numeroturno"
-						includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+						includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 						x="339" y="92" color="#f69c00" fontFamily="Counter-Strike" fontSize="70.86"
 						fontWeight="bold" kerning="off" lineHeight="652.7%"
 						whiteSpaceCollapse="preserve"
@@ -890,27 +907,27 @@
 				</s:filters>
 			</s:RichText>
 			<s:Button id="btn_lanz1" d:userLabel="ta-puntoshueco1"
-					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					  x="318" y="149" label="120" enabled="true" skinClass="components.Orificio"
 					  x.Principal="318" y.Principal="127" label.Principal="120"/>
 			<s:Button id="btn_lanz2" d:userLabel="ta-puntoshueco2"
-					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					  x="427" y="149" label="20" enabled="false" skinClass="components.Orificio"
 					  x.Principal="427" y.Principal="127"/>
 			<s:Button id="btn_lanz3" d:userLabel="ta-puntoshueco3"
-					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					  x="537" y="149" label="20" enabled="false" skinClass="components.Orificio"
 					  x.Principal="537" y.Principal="127"/>
 			<s:Button id="btn_lanz4" d:userLabel="ta-puntoshueco4"
-					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					  x="318" y="258" label="20" enabled="false" skinClass="components.Orificio"
 					  x.Principal="318" y.Principal="226"/>
 			<s:Button id="btn_lanz5" d:userLabel="ta-puntoshueco5"
-					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					  x="427" y="258" label="30" enabled="false" skinClass="components.Orificio"
 					  x.Principal="427" y.Principal="226"/>
 			<s:Button id="btn_lanz6" d:userLabel="ta-puntoshueco6"
-					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					  includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					  x="537" y="258" label="20" enabled="false" skinClass="components.Orificio"
 					  x.Principal="537" y.Principal="226"/>
 			<s:Button id="btn_lanz7" d:userLabel="ta-puntoshueco1" includeIn="Comenzar,Principal"
@@ -919,7 +936,7 @@
 			
 		</fx:DesignLayer>
 		<s:RichText d:userLabel="ta-tipodejuego"
-					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					x="857" y="27" color="#ffffff" fontFamily="Counter-Strike" fontSize="34.41"
 					fontWeight="bold" kerning="off" lineHeight="652.7%" text="tipo de juego"
 					textAlign="center" whiteSpaceCollapse="preserve"
@@ -929,7 +946,7 @@
 					text.Principal="Meta">
 		</s:RichText>
 		<s:RichText id="lbl_tipo_juego_princ" d:userLabel="ta-tipodejuego"
-					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					x="857" y="27" color="#ffffff" fontFamily="Counter-Strike" fontSize="60"
 					fontWeight="bold" kerning="off" lineHeight="652.7%" text="800 puntos"
 					textAlign="center" whiteSpaceCollapse="preserve"
@@ -948,14 +965,15 @@
 					visible.FinJuego="false"
 					visible.Ganaste="false"
 					visible.Jugadores="false"
+					visible.Monona="false"
 					visible.Principal="false"
 					visible.Puntajes="false"
 					visible.TipoDeJuego="false">
 		<s:BitmapImage d:userLabel="b-fondo"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					   x="0" y="0" smooth="true" source="@Embed('/assets/images/rana-v2/Fondo.png')"/>
 		<s:RichText id="richtext7" d:userLabel="b-tequedan"
-					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					x="219" y="601" color="#ffffff" fontFamily="Counter-Strike" fontSize="40.92"
 					fontWeight="bold" kerning="off" lineHeight="652.7%" textAlign="right"
 					whiteSpaceCollapse="preserve"
@@ -964,7 +982,7 @@
 			<s:content.Blanqueado><s:p><s:span><![CDATA[SOLO TE QUEDAN    ]]></s:span><s:span fontSize="73.35" lineHeight="267%"><![CDATA[    ]]></s:span><s:span>BLANQUEADAS</s:span></s:p></s:content.Blanqueado>
 		</s:RichText>
 		<s:RichText id="lbl_num_blanqueadas"
-					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					x="640" y="617" color="#ffffff" fontFamily="Counter-Strike" fontSize="100.049"
 					fontWeight="bold" kerning="off" lineHeight="267%" textAlign="center"
 					whiteSpaceCollapse="preserve"
@@ -972,11 +990,11 @@
 					color.Blanqueado="#FFFFFF">
 		</s:RichText>
 		<s:BitmapImage d:userLabel="b-rana"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					   x="419" y="198" smooth="true"
 					   source="@Embed('/assets/images/rana-v2/Capa 7 copia 2.png')"/>
 		<s:BitmapImage d:userLabel="b-blanqueado"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					   x="232" y="82" smooth="true"
 					   source="@Embed('/assets/images/rana-v2/¡BLANQUEADO!.png')"/>
 	</fx:DesignLayer>
@@ -985,14 +1003,15 @@
 					visible.Comenzar="false"
 					visible.Ganaste="false"
 					visible.Jugadores="false"
+					visible.Monona="false"
 					visible.Principal="false"
 					visible.Puntajes="false"
 					visible.TipoDeJuego="false">
 		<s:BitmapImage d:userLabel="g-fondo"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					   x="0" y="0" smooth="true" source="@Embed('/assets/images/rana-v2/Fondo.png')"/>
 		<s:BitmapImage d:userLabel="g-rana"
-					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Principal,Puntajes,TipoDeJuego"
+					   includeIn="Blanqueado,Comenzar,FinJuego,Ganaste,Jugadores,Monona,Principal,Puntajes,TipoDeJuego"
 					   x="899" y="197" smooth="true"
 					   source="@Embed('/assets/images/rana-v2/rana_felicitaciones.png')"
 					   x.FinJuego="899" y.FinJuego="198"/>
@@ -1049,6 +1068,7 @@
 						  strength="3"/>
 		</s:filters>
 	</s:Label>
+	<s:Image includeIn="Monona" x="0" y="0" source="@Embed('assets/images/rana-v2/chicos_rana.png')"/>
 		
 	<s:transitions>
 		<s:Transition autoReverse="true" fromState="TipoDeJuego" toState="Puntajes">
