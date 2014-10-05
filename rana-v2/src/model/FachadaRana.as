@@ -38,6 +38,10 @@ package model {
 			return _terminado;
 		}
 		
+		public function getPuntosEnOrificio(orificio:int):int{
+			return conf.getPuntoEnOrificio(orificio);
+		}
+		
 		
 		public function getSiguienteTurno():int{
 			return this.chico.getSiguienteTurno();

@@ -14,14 +14,14 @@
 	 <maxrecords>5</maxrecords>
      <orificio id="1">30</orificio>
      <orificio id="2">30</orificio>
-     <orificio id="3">30</orificio>
+     <orificio id="3">32</orificio>
      <orificio id="4">20</orificio>
      <orificio id="5">40</orificio>
-     <orificio id="6">20</orificio>
+     <orificio id="6">25</orificio>
      <orificio id="7">15</orificio>
      <orificio id="8">120</orificio>
-     <orificio id="9">15</orificio>
+     <orificio id="9">18</orificio>
      <orificio id="10">10</orificio>
      <orificio id="11">100</orificio>
-     <orificio id="12">10</orificio>
+     <orificio id="12">12</orificio>
 </configuracion>

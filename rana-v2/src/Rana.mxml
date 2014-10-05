@@ -741,21 +741,21 @@
 				</s:Group>
 			</s:mask>
 		</s:BitmapImage>
-		<fx:DesignLayer id="designlayer7" d:userLabel="10"
+		<fx:DesignLayer id="designlayer7" 
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
 			<components:FormaCustomComponent id="bmp_orificio10" includeIn="Comenzar,Principal"
-											 x="738" y="105" valor="10">
+											 x="738" y="105" valor="{fachada.getPuntosEnOrificio(10)}">
 			</components:FormaCustomComponent>
 			<fx:DesignLayer d:userLabel="Layer 2"/>
 		</fx:DesignLayer>
-		<fx:DesignLayer id="designlayer8" d:userLabel="10 copia"
+		<fx:DesignLayer id="designlayer8" 
 						visible.Jugadores="false"
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
 			<components:FormaCustomComponent id="bmp_orificio12" includeIn="Comenzar,Principal"
-											 x="1060" y="105" valor="10">
+											 x="1060" y="105" valor="{fachada.getPuntosEnOrificio(12)}">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer9" d:userLabel="100"
@@ -763,7 +763,7 @@
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
 			<components:FormaCustomComponent id="bmp_orificio11" includeIn="Comenzar,Principal"
-											 x="899" y="105" amarilla="true" valor="100">
+											 x="899" y="105" amarilla="true" valor="{fachada.getPuntosEnOrificio(11)}">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer10" d:userLabel="120"
@@ -771,7 +771,7 @@
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
 			<components:FormaCustomComponent id="bmp_orificio8" includeIn="Comenzar,Principal"
-											 x="899" y="267" amarilla="true" valor="120">
+											 x="899" y="267" amarilla="true" valor="{fachada.getPuntosEnOrificio(8)}">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer11" d:userLabel="15"
@@ -779,7 +779,7 @@
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
 			<components:FormaCustomComponent id="bmp_orificio7" includeIn="Comenzar,Principal"
-											 x="738" y="267" valor="15">
+											 x="738" y="267" valor="{fachada.getPuntosEnOrificio(7)}">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer12" d:userLabel="15 copia"
@@ -787,7 +787,7 @@
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
 			<components:FormaCustomComponent id="bmp_orificio9" includeIn="Comenzar,Principal"
-											 x="1060" y="267" valor="15">
+											 x="1060" y="267" valor="{fachada.getPuntosEnOrificio(9)}">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer13" d:userLabel="20"
@@ -795,7 +795,7 @@
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
 			<components:FormaCustomComponent id="bmp_orificio4" includeIn="Comenzar,Principal"
-											 x="738" y="432" valor="20">
+											 x="738" y="432" valor="{fachada.getPuntosEnOrificio(4)}">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer14" d:userLabel="20 copia"
@@ -803,7 +803,7 @@
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
 			<components:FormaCustomComponent id="bmp_orificio6" includeIn="Comenzar,Principal"
-											 x="1060" y="432" valor="20">
+											 x="1060" y="432" valor="{fachada.getPuntosEnOrificio(6)}">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer15" d:userLabel="40"
@@ -811,7 +811,7 @@
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
 			<components:FormaCustomComponent id="bmp_orificio5" includeIn="Comenzar,Principal"
-											 x="899" y="432" valor="40">
+											 x="899" y="432" valor="{fachada.getPuntosEnOrificio(5)}">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer16" d:userLabel="30"
@@ -819,7 +819,7 @@
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
 			<components:FormaCustomComponent id="bmp_orificio1" includeIn="Comenzar,Principal"
-											 x="738" y="595" valor="30">
+											 x="738" y="595" valor="{fachada.getPuntosEnOrificio(1)}">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer17" d:userLabel="30 copia"
@@ -827,7 +827,7 @@
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
 			<components:FormaCustomComponent id="bmp_orificio2" includeIn="Comenzar,Principal"
-											 x="899" y="595" valor="30">
+											 x="899" y="595" valor="{fachada.getPuntosEnOrificio(3)}">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer id="designlayer18" d:userLabel="30 copia 2"
@@ -835,7 +835,7 @@
 						visible.Puntajes="false"
 						visible.TipoDeJuego="false">
 			<components:FormaCustomComponent id="bmp_orificio3" includeIn="Comenzar,Principal"
-											 x="1060" y="595" valor="30">
+											 x="1060" y="595" valor="{fachada.getPuntosEnOrificio(2)}">
 			</components:FormaCustomComponent>
 		</fx:DesignLayer>
 		<fx:DesignLayer d:userLabel="Turno actual">
