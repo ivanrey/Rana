@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<fxpProperties abbreviated="false" authoringTool="Flex Builder" compiles="true" parentProject="71bfc6c3-f619-44f3-a06b-928532509858" projectUUID="71bfc6c3-f619-44f3-a06b-928532509858" pureCatalystProject="false" sdkVersion="4.6.0" uuid="47f4fb98-4c0f-40b8-97c9-264a28c2f4de" version="15">
+  <projects/>
+  <src/>
+  <swc>
+    <linked location="sdkPlaceHolder" path="sdkPlaceHolder" position="0" uuid="47f4fb98-4c0f-40b8-97c9-264a28c2f4de"/>
+    <linked location="C:/Users/Ivan/Documents/GitHub/Rana/rana-v2/libs" path="/libs" position="1" uuid="47f4fb98-4c0f-40b8-97c9-264a28c2f4de"/>
+  </swc>
+  <misc/>
+  <theme/>
+  <mxmlFormattingPrefs groupAttributesByState="true" maxLineWidth="100" mxmlAlignAttributes="true" mxmlAttributeOrder="id,userLabel,includeIn,excludeFrom,visible,x,y,z,left,right,top,bottom,width,height,minWidth,minHeight,maxWidth,maxHeight,label" mxmlKeepAttributeValuesOrganized="true"/>
+</fxpProperties>
